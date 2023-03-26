@@ -17,6 +17,7 @@ function loadRoutes(filePath, routePath = '') { //封装递归
       newRoutePath = file.match(/^index./) ? routePath : `${routePath}/${file.split('.')[0]}`;
       let route = require(newFilePath);
       //注册路由
+      if (!route) return
       router.use(newRoutePath, route.routes())
       router.use(route.allowedMethods())
     }
