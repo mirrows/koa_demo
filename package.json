@@ -1,7 +1,9 @@
 {
   "license": "ISC",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "./node_modules/.bin/nodemon index.js",
+    "prd": "pm2 start index.js"
   },
   "dependencies": {
     "koa": "^2.14.1",
