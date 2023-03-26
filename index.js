@@ -28,7 +28,7 @@ app.use(async (ctx, next) => {
 });
 
 app.use(static(__dirname + '/static'));
-loadRoutes('./routes');
+loadRoutes(__dirname + '/routes');
 app.use(router.routes(), router.allowedMethods())
 
 app.listen(16001, () => {
