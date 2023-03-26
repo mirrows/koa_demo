@@ -12,7 +12,6 @@ router.post('/token', async (ctx, next) => {
       msg: '请输入code'
     }
   }
-  console.log(githubClientID, githubSecret)
   try {
     // 在 axios 请求时，选择性忽略 SSL
     const agent = new https.Agent({
@@ -24,7 +23,6 @@ router.post('/token', async (ctx, next) => {
       code,
     }, { headers: { Accept: "application/vnd.github+json" }, httpsAgent: agent }
     )
-    console.log(status, data)
     if (status === 200) {
       ctx.body = data
     } else {
