@@ -1,8 +1,10 @@
 const { default: axios } = require('axios');
 const { githubToken } = require('../utils/config');
-
+const https = require("https");
 const router = require('koa-router')(); //引入并实例化
-
+const agent = new https.Agent({
+  rejectUnauthorized: false
+});
 const dataBase = {
   visitor: {}
 }
@@ -22,6 +24,7 @@ router.get('/', async (ctx) => {
     }
     body[new Date().toLocaleDateString()] || (body[new Date().toLocaleDateString()] = { [ip]: 1 })
     body.total = (body.total || 0) + (body[new Date().toLocaleDateString()]?.[ip] ? 0 : 1)
+    console.log(body, dataBase.visitor)
     await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
@@ -29,6 +32,7 @@ router.get('/', async (ctx) => {
         Accept: "application/vnd.github+json",
         Authorization: githubToken,
       },
+      httpsAgent: agent,
       data: { body: JSON.stringify(body) }
     })
     ctx.body = {
@@ -61,6 +65,7 @@ router.post('/', async (ctx) => {
         Accept: "application/vnd.github+json",
         Authorization: githubToken,
       },
+      httpsAgent: agent,
       data: { body: JSON.stringify(body) }
     })
     ctx.body = {
@@ -82,6 +87,7 @@ async function initVisitorsData() {
       Accept: "application/vnd.github+json",
       Authorization: githubToken,
     },
+    httpsAgent: agent,
   })
   dataBase.visitor = JSON.parse(data.body)
 }
