@@ -54,7 +54,7 @@ router.post('/', async (ctx) => {
     body[new Date().toLocaleDateString()] || (body[new Date().toLocaleDateString()] = {})
     body[new Date().toLocaleDateString()][ip] = (body[new Date().toLocaleDateString()][ip] || 0) + time
     console.log(body)
-    const res = await axios({
+    await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
       headers: {
