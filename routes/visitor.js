@@ -15,15 +15,17 @@ initVisitorsData();
 router.get('/', async (ctx) => {
   const ip = getClientIP(ctx.request)
   const today = new Date().toLocaleDateString()
+  console.log(777, dataBase.visitor, today, ip)
   try {
     // const body = JSON.parse(data.body)
+    dataBase.visitor[today] || (dataBase.visitor[today] = {})
+    dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today][ip] ? 0 : 1)
+    dataBase.visitor[today][ip] = dataBase.visitor[today][ip] || 1
     const result = {
-      total: (dataBase.visitor.total || 0) + 1,
+      total: (dataBase.visitor.total || 0),
       today: Object.keys(dataBase.visitor[today] || {}).length,
       visitorTime: dataBase.visitor[today]?.[ip] || 0,
     }
-    dataBase.visitor[today] || (dataBase.visitor[today] = { [ip]: 1 })
-    dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today]?.[ip] ? 0 : 1)
     await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
