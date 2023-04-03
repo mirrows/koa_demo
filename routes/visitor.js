@@ -14,17 +14,16 @@ initVisitorsData();
 // 今日访问量查询
 router.get('/', async (ctx) => {
   const ip = getClientIP(ctx.request)
+  const today = new Date().toLocaleDateString()
   try {
-    const { visitor: body } = dataBase
     // const body = JSON.parse(data.body)
     const result = {
-      total: (body.total || 0) + 1,
-      today: Object.keys(body[new Date().toLocaleDateString()] || {}).length,
-      visitorTime: body[new Date().toLocaleDateString()]?.[ip] || 0,
+      total: (dataBase.visitor.total || 0) + 1,
+      today: Object.keys(dataBase.visitor[today] || {}).length,
+      visitorTime: dataBase.visitor[today]?.[ip] || 0,
     }
-    body[new Date().toLocaleDateString()] || (body[new Date().toLocaleDateString()] = { [ip]: 1 })
-    body.total = (body.total || 0) + (body[new Date().toLocaleDateString()]?.[ip] ? 0 : 1)
-    console.log(body, dataBase.visitor)
+    dataBase.visitor[today] || (dataBase.visitor[today] = { [ip]: 1 })
+    dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today]?.[ip] ? 0 : 1)
     await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
@@ -33,7 +32,7 @@ router.get('/', async (ctx) => {
         Authorization: githubToken,
       },
       httpsAgent: agent,
-      data: { body: JSON.stringify(body) }
+      data: { body: JSON.stringify(dataBase.visitor) }
     })
     ctx.body = {
       code: 0,
@@ -52,12 +51,11 @@ router.get('/', async (ctx) => {
 router.post('/', async (ctx) => {
   const ip = getClientIP(ctx.request)
   const { time = 1 } = JSON.parse(ctx.request.body)
+  const today = new Date().toLocaleDateString()
   try {
-    const { visitor: body } = dataBase
     // const body = JSON.parse(data.body)
-    body[new Date().toLocaleDateString()] || (body[new Date().toLocaleDateString()] = {})
-    body[new Date().toLocaleDateString()][ip] = (body[new Date().toLocaleDateString()][ip] || 0) + time
-    console.log(body)
+    dataBase.visitor[today] || (dataBase.visitor[today] = {})
+    dataBase.visitor[today][ip] = (dataBase.visitor[today][ip] || 0) + time
     await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
@@ -66,7 +64,7 @@ router.post('/', async (ctx) => {
         Authorization: githubToken,
       },
       httpsAgent: agent,
-      data: { body: JSON.stringify(body) }
+      data: { body: JSON.stringify(dataBase.visitor) }
     })
     ctx.body = {
       code: 0,
