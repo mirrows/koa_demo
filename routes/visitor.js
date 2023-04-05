@@ -29,7 +29,7 @@ router.get('/', async (ctx) => {
         [ip]: 1,
         ...combainObj(dataBaseBody[today], dataBase.visitor[today]),
       },
-      total: Math.max((dataBase.visitor.total || 0), (dataBaseBody.total || 0), 0) + (dataBaseBody[today]?.[ip] ? 0 : 1)
+      total: Math.max((dataBase.visitor.total || 0), (dataBaseBody.total || 0), 0) + (dataBaseBody[today]?.[ip] || dataBase.visitor[today]?.[ip] ? 0 : 1)
     }
     // dataBase.visitor[today] || (dataBase.visitor[today] = {})
     // dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today][ip] ? 0 : 1)
