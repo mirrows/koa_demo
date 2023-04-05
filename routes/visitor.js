@@ -31,9 +31,6 @@ router.get('/', async (ctx) => {
       },
       total: Math.max((dataBase.visitor.total || 0), (dataBaseBody.total || 0), 0) + (dataBaseBody[today]?.[ip] || dataBase.visitor[today]?.[ip] ? 0 : 1)
     }
-    // dataBase.visitor[today] || (dataBase.visitor[today] = {})
-    // dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today][ip] ? 0 : 1)
-    // dataBase.visitor[today][ip] = dataBase.visitor[today][ip] || 1
     const result = {
       total: (dataBase.visitor.total || 0),
       today: Object.keys(dataBase.visitor[today] || {}).length,
@@ -85,8 +82,6 @@ router.post('/', async (ctx) => {
         [ip]: (Math.max(dataBase.visitor[today][ip], dataBaseBody[today]?.[ip]) || 0) + time
       },
     }
-    // dataBase.visitor[today] || (dataBase.visitor[today] = {})
-    // dataBase.visitor[today][ip] = (dataBase.visitor[today][ip] || 0) + time
     await axios({
       url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
       method: 'PATCH',
