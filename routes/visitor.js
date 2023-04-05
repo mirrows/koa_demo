@@ -27,10 +27,9 @@ router.get('/', async (ctx) => {
       ...dataBase.visitor,
       [today]: {
         [ip]: 1,
-        ...(dataBaseBody[today] || {}),
-        ...(dataBase.visitor[today] || {})
+        ...combainObj(dataBaseBody[today], dataBase.visitor[today]),
       },
-      total: (dataBase.visitor.total || dataBaseBody.total || 0) + (dataBase.visitor[today]?.[ip] ? 0 : 1)
+      total: Math.max((dataBase.visitor.total || 0), (dataBaseBody.total || 0), 0) + (dataBaseBody[today]?.[ip] ? 0 : 1)
     }
     // dataBase.visitor[today] || (dataBase.visitor[today] = {})
     // dataBase.visitor.total = (dataBase.visitor.total || 0) + (dataBase.visitor[today][ip] ? 0 : 1)
@@ -82,8 +81,7 @@ router.post('/', async (ctx) => {
       ...dataBaseBody,
       ...dataBase.visitor,
       [today]: {
-        ...(dataBaseBody[today] || {}),
-        ...(dataBase.visitor[today] || {}),
+        ...combainObj(dataBaseBody[today], dataBase.visitor[today]),
         [ip]: (Math.max(dataBase.visitor[today][ip], dataBaseBody[today]?.[ip]) || 0) + time
       },
     }
@@ -111,6 +109,14 @@ router.post('/', async (ctx) => {
     }
   }
 })
+
+function combainObj(obj1 = {}, obj2 = {}) {
+  const obj = {}
+  Object.keys({ ...obj1, ...obj2 }).forEach(key => {
+    obj[key] = Math.max(obj1[key] || 1, obj2[key] || 1)
+  })
+  return obj
+}
 
 function getClientIP(req) {
   let ip = req.headers['x-forwarded-for'] || // 判断是否有反向代理 IP
