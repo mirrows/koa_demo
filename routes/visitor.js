@@ -79,7 +79,7 @@ router.post('/', async (ctx) => {
       ...dataBase.visitor,
       [today]: {
         ...combainObj(dataBaseBody[today], dataBase.visitor[today]),
-        [ip]: (Math.max(dataBase.visitor[today][ip], dataBaseBody[today]?.[ip]) || 0) + time
+        [ip]: (Math.max(dataBase.visitor[today]?.[ip] || 0, dataBaseBody[today]?.[ip]) || 0) + time
       },
     }
     await axios({
