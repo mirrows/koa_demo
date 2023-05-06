@@ -1,4 +1,5 @@
 const router = require('koa-router')(); //引入并实例化
+const { githubToken } = require('../utils/config');
 const { default: req } = require('../utils/req');
 
 // router.get('/', ctx => {
