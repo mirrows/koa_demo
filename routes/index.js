@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const { req } = require('../utils/req');
 
 const router = require('koa-router')(); //引入并实例化
 
@@ -15,7 +15,7 @@ router.post('/awake', (ctx) => {
 
 router.get('/bing', async ctx => {
   const { n = 1 } = ctx.request.query
-  const { status, data } = await axios.get('https://bing.com/HPImageArchive.aspx', {
+  const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
     params: { format: 'js', n },
   })
   if (status === 200) {

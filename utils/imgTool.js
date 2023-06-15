@@ -1,9 +1,9 @@
-const { default: axios } = require('axios');
 const sharp = require('sharp');
+const { req } = require('./req');
 
 function imgUrlToBase64(url) {
   return new Promise(function (resolve) {
-    axios.get(url, { responseType: 'arraybuffer' })
+    req.get(url, { responseType: 'arraybuffer' })
       .then(async res => {
         // const suffix = getImageSuffix(res.data)
         // console.log(suffix)

@@ -1,10 +1,8 @@
-const { default: axios } = require('axios');
-const { githubToken } = require('../utils/config');
+const { githubToken, gUser } = require('../utils/config');
 const https = require("https");
+const { req } = require('../utils/req');
 const router = require('koa-router')(); //引入并实例化
-const agent = new https.Agent({
-  rejectUnauthorized: false
-});
+
 const dataBase = {
   visitor: {}
 }
@@ -13,12 +11,11 @@ const dataBase = {
 router.get('/', async (ctx) => {
   const ip = getClientIP(ctx.request)
   const today = new Date().toLocaleDateString()
-  const { data } = await axios.get('https://api.github.com/repos/mirrows/mirrows.github.io/issues/1', {
+  const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: githubToken,
     },
-    httpsAgent: agent,
   })
   try {
     const dataBaseBody = JSON.parse(data.body)
@@ -36,14 +33,13 @@ router.get('/', async (ctx) => {
       today: Object.keys(dataBase.visitor[today] || {}).length,
       visitorTime: dataBase.visitor[today]?.[ip] || 0,
     }
-    await axios({
-      url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
+    await req({
+      url: `https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`,
       method: 'PATCH',
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: githubToken,
       },
-      httpsAgent: agent,
       data: { body: JSON.stringify(dataBase.visitor) }
     })
     ctx.body = {
@@ -65,12 +61,11 @@ router.post('/', async (ctx) => {
   const ip = getClientIP(ctx.request)
   const { time = 1 } = JSON.parse(ctx.request.body)
   const today = new Date().toLocaleDateString()
-  const { data } = await axios.get('https://api.github.com/repos/mirrows/mirrows.github.io/issues/1', {
+  const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: githubToken,
     },
-    httpsAgent: agent,
   })
   try {
     const dataBaseBody = JSON.parse(data.body)
@@ -82,14 +77,13 @@ router.post('/', async (ctx) => {
         [ip]: (Math.max(dataBase.visitor[today]?.[ip] || 0, dataBaseBody[today]?.[ip]) || 0) + time
       },
     }
-    await axios({
-      url: 'https://api.github.com/repos/mirrows/mirrows.github.io/issues/1',
+    await req({
+      url: `https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`,
       method: 'PATCH',
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: githubToken,
       },
-      httpsAgent: agent,
       data: { body: JSON.stringify(dataBase.visitor) }
     })
     ctx.body = {

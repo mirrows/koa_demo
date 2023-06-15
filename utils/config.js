@@ -5,5 +5,8 @@ module.exports = {
   cibaKey: process.env.CIBA_KEY,
   githubClientID: process.env.GITHUB_CLIENT_ID,
   githubSecret: process.env.GITHUB_SECRET,
-  githubToken: process.env.GITHUB_TOKEN
+  githubToken: process.env.GITHUB_TOKEN,
+  useGitee: process.env.USE_GITEE,
+  gUser: process.env.GITHUB_USER,
+
 }

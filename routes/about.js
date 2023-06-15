@@ -1,13 +1,13 @@
 const router = require('koa-router')(); //引入并实例化
-const { githubToken } = require('../utils/config');
-const { default: req } = require('../utils/req');
+const { githubToken, gUser } = require('../utils/config');
+const { req } = require('../utils/req');
 
 // router.get('/', ctx => {
 //   ctx.body = 'about me';
 // })
 
 router.get('/', async (ctx) => {
-  const { data } = await req.get('https://api.github.com/repos/mirrows/mirrows.github.io/issues/2', {
+  const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/2`, {
     headers: {
       Accept: "application/vnd.github+json",
     },

@@ -5,8 +5,6 @@ const agent = new https.Agent({
   rejectUnauthorized: false
 });
 // 创建实例时配置默认值
-const instance = axios.create({
+exports.req = axios.create({
   httpsAgent: agent
 });
-
-exports.default = instance
