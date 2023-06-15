@@ -1,12 +1,12 @@
-const { default: axios } = require('axios');
 const { cibaKey } = require('../utils/config');
+const { req } = require('../utils/req');
 
 const router = require('koa-router')(); //引入并实例化
 
 router.get('/sentence', async ctx => {
   const now = new Date().toLocaleDateString().split('/').map(str => str.padStart(2, 0)).join('-')
   const { time = now } = ctx.request.query
-  const { status, data } = await axios.get('https://sentence.iciba.com/index.php', {
+  const { status, data } = await req.get('https://sentence.iciba.com/index.php', {
     params: {
       c: 'dailysentence',
       m: 'getdetail',
@@ -42,7 +42,7 @@ router.get('/translation', async ctx => {
       msg: '文本为空,请输入翻译文本'
     }
   }
-  const { status, data } = await axios.get('http://dict-co.iciba.com/api/dictionary.php', {
+  const { status, data } = await req.get('http://dict-co.iciba.com/api/dictionary.php', {
     params: {
       w: w,
       key: cibaKey,
