@@ -32,5 +32,16 @@ router.get('/bing', async ctx => {
   }
 })
 
+router.get('/ip', async (ctx) => {
+  const { data } = await req.get('https://ip.useragentinfo.com/json').catch(err => {
+    console.log(err)
+  })
+  console.log(data)
+  ctx.body = {
+    code: 0,
+    data,
+  }
+})
+
 module.exports = router;
 
