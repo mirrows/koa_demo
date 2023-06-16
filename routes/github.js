@@ -5,7 +5,6 @@ const router = require('koa-router')(); //引入并实例化
 
 router.post('/token', async (ctx, next) => {
   const { code } = JSON.parse(ctx.request.body)
-  console.log(code, githubClientID)
   if (!code) {
     ctx.status = 403
     return ctx.body = {
@@ -133,7 +132,22 @@ router.get('/queryComments', async (ctx) => {
 router.get('/listArticals', async (ctx) => {
   const { authorization } = ctx.request.headers
   const { number } = ctx.request.query
-  const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues${+String(number) + 1 ? `/${number}` : ''}`, {
+  const totalSql = `query { 
+    repository(owner: "mirrows", name: "mirrows.github.io"){
+      issues(filterBy: {labels: ["blog"]}){
+      	totalCount
+      }
+    }
+  }`
+  const totalReq = req.post('https://api.github.com/graphql', {
+    query: totalSql,
+  }, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: authorization || githubToken,
+    }
+  })
+  const dataReq = req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues${+String(number) + 1 ? `/${number}` : ''}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: authorization || githubToken,
@@ -142,6 +156,9 @@ router.get('/listArticals', async (ctx) => {
   }).catch(err => {
     console.log(err)
   })
+  const [{value: {data: totalData}}, {value: {data}}] = await Promise.allSettled([totalReq, dataReq])
+  console.log(totalData, data)
+  const total = totalData.data.repository.issues.totalCount
   const result = (+String(number) + 1?[data]:data)?.map(artical => {
     let msg = {}
     try {
@@ -154,6 +171,7 @@ router.get('/listArticals', async (ctx) => {
   ctx.body = {
     code: 0,
     data: +String(number) + 1 ? result[0] : result,
+    total,
   }
 })
 
