@@ -108,6 +108,13 @@ function combainObj(obj1 = {}, obj2 = {}) {
 }
 
 function getClientIP(req) {
+  console.log(
+    req.headers['x-forwarded-for'],
+    req.ip,
+    req.connection?.remoteAddress,
+    req.socket?.remoteAddress,
+    req.connection?.socket?.remoteAddress
+  )
   let ip = req.headers['x-forwarded-for'] || // 判断是否有反向代理 IP
     req.ip ||
     req.connection?.remoteAddress || // 判断 connection 的远程 IP
