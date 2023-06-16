@@ -9,7 +9,8 @@ const dataBase = {
 
 // 今日访问量查询
 router.get('/', async (ctx) => {
-  const ip = getClientIP(ctx.request)
+  const { ip } = ctx.request.query
+  console.log(ip)
   const today = new Date().toLocaleDateString()
   const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`, {
     headers: {
@@ -58,8 +59,7 @@ router.get('/', async (ctx) => {
 
 // 统计当天访问量
 router.post('/', async (ctx) => {
-  const ip = getClientIP(ctx.request)
-  const { time = 1 } = JSON.parse(ctx.request.body)
+  const { time = 1, ip } = JSON.parse(ctx.request.body)
   const today = new Date().toLocaleDateString()
   const { data } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1`, {
     headers: {
@@ -108,6 +108,13 @@ function combainObj(obj1 = {}, obj2 = {}) {
 }
 
 function getClientIP(req) {
+  console.log(
+    req.headers['x-forwarded-for'],
+    req.ip,
+    req.connection?.remoteAddress,
+    req.socket?.remoteAddress,
+    req.connection?.socket?.remoteAddress
+  )
   let ip = req.headers['x-forwarded-for'] || // 判断是否有反向代理 IP
     req.ip ||
     req.connection?.remoteAddress || // 判断 connection 的远程 IP
