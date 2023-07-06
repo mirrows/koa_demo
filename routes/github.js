@@ -1,5 +1,4 @@
 const { githubClientID, githubSecret, githubToken, gUser } = require('../utils/config');
-const https = require("https");
 const { req } = require('../utils/req');
 const router = require('koa-router')(); //引入并实例化
 

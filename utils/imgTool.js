@@ -9,7 +9,6 @@ function imgUrlToBase64(url) {
         // console.log(suffix)
         const imageBuffer = Buffer.from(res.data);
         const metadata = await sharp(imageBuffer).metadata();
-        console.log(metadata)
         resolve({metadata, data: Buffer.from(res.data, 'binary').toString('base64')})
       })
       .catch(e => {
@@ -18,6 +17,21 @@ function imgUrlToBase64(url) {
       })
   })
 }
+
+function fileCompressor (file, options){
+  return new Promise((resolve, reject) => {
+    new Compressor(file, {
+      ...options,
+      success(blob) {
+        resolve(blob)
+      },
+      error(err) {
+        reject(err);
+      }
+    })
+  })
+}
+
 
 const base64ToFile = (base64, fileName) => {
   let arr = base64.split(','),
@@ -94,4 +108,5 @@ module.exports = {
   imgUrlToBase64,
   base64ToFile,
   getImageSuffix,
+  fileCompressor
 }

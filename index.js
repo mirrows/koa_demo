@@ -4,7 +4,7 @@ const { koaBody } = require('koa-body');
 const static = require('koa-static');
 const { loadRoutes, router } = require('./utils/routes');
 
-app.use(koaBody());
+app.use(koaBody({jsonLimit: '50mb'}));
 
 app.use(async (ctx, next) => {
   ctx.set('Access-Control-Allow-Origin', '*');
