@@ -60,4 +60,26 @@ router.put('/uploadUrl', async (ctx) => {
   }
 })
 
+router.post('/queryPicList', async (ctx) => {
+  const { path } = ctx.request.body
+  const { authorization } = ctx.request.headers
+  const { data } = await req.get(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: authorization || githubToken,
+    },
+  })
+  ctx.body = {
+    code: 0,
+    data: data.reverse().map(f => ({
+      ...f,
+      name: f.name.replaceAll('_', '-'),
+      cdn_url: f.download_url?.replace(
+        'https://raw.githubusercontent.com/mirrows/photo/main',
+        'https://p.t-n.top/'
+      )
+    })),
+  }
+})
+
 module.exports = router;
