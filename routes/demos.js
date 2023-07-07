@@ -62,7 +62,6 @@ router.put('/uploadUrl', async (ctx) => {
 
 router.post('/queryPicList', async (ctx) => {
   const { path } = ctx.request.body
-  console.log(path)
   const { authorization } = ctx.request.headers
   const { data } = await req.get(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
     headers: {
