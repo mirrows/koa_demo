@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const sharp = require('sharp');
 const { githubToken, gUser } = require("../utils/config");
 const { imgUrlToBase64 } = require('../utils/imgTool');
 const { req } = require("../utils/req")
@@ -32,26 +33,19 @@ router.put('/uploadBase64', async (ctx) => {
 })
 
 router.put('/uploadUrl', async (ctx) => {
-  // const { content, path } = JSON.parse(ctx.request.body)
   const { url, path } = ctx.request.body
   const { authorization } = ctx.request.headers
-  const base64 = await imgUrlToBase64(url)
-  console.log(base64.data.slice(0, 60))
-  const realPath = `${path}/${'pic' + Date.now() + String(Math.random()).slice(4, 7) + '.' + base64.metadata.format}`
-  await req.put(`https://api.github.com/repos/${gUser}/photo/contents/mini/${realPath}`, {
-    content: base64.data,
-    message: `create mini img`
-  }, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
-    },
-  }).catch(err => {
-    console.log(err)
+  const base64 = await imgUrlToBase64(url, async (buffer, meta) => {
+    const img = sharp(buffer)
+    const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
+    ? img.toBuffer()
+      : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
+    return buf
   })
-  const { data } = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/normal/${realPath}`, {
+  const realPath = `${path}/${'pic' + Date.now() + String(Math.random()).slice(4, 7) + '.' + base64.metadata.format}`
+  const { data } = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${realPath}`, {
     content: base64.data,
-    message: `create normal img`
+    message: `create ${realPath.split('/')[0]} img`
   }, {
     headers: {
       Accept: "application/vnd.github+json",

@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const { req } = require('./req');
 
-function imgUrlToBase64(url) {
+function imgUrlToBase64(url, cb=async () => { }) {
   return new Promise(function (resolve) {
     req.get(url, { responseType: 'arraybuffer' })
       .then(async res => {
@@ -9,7 +9,8 @@ function imgUrlToBase64(url) {
         // console.log(suffix)
         const imageBuffer = Buffer.from(res.data);
         const metadata = await sharp(imageBuffer).metadata();
-        resolve({metadata, data: Buffer.from(res.data, 'binary').toString('base64')})
+        const data = await cb(imageBuffer, metadata)
+        resolve({metadata, data: (data || Buffer.from(res.data, 'binary')).toString('base64')})
       })
       .catch(e => {
         console.log(e)
