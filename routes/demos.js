@@ -15,20 +15,28 @@ router.put('/uploadBase64', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { content, path } = ctx.request.body
   const { authorization } = ctx.request.headers
-  const { data } = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+  const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
     content,
     message: `create ${path.split('/')[0]} img`
   }, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
+      Authorization: githubToken || authorization,
     },
   }).catch(err => {
     console.log(err)
   })
-  ctx.body = {
-    code: 0,
-    data,
+  if (res?.data) {
+    ctx.body = {
+      code: 0,
+      data: res.data,
+    }
+  } else {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '请求出错，请联系管理员'
+    }
   }
 })
 
@@ -43,20 +51,28 @@ router.put('/uploadUrl', async (ctx) => {
     return buf
   })
   const realPath = `${path}/${'pic' + Date.now() + String(Math.random()).slice(4, 7) + '.' + base64.metadata.format}`
-  const { data } = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${realPath}`, {
+  const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${realPath}`, {
     content: base64.data,
     message: `create ${realPath.split('/')[0]} img`
   }, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
+      Authorization: githubToken || authorization,
     },
   }).catch(err => {
     console.log(err)
   })
-  ctx.body = {
-    code: 0,
-    data,
+  if (res?.data) {
+    ctx.body = {
+      code: 0,
+      data: res.data,
+    }
+  } else {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '请求出错，请联系管理员'
+    }
   }
 })
 
