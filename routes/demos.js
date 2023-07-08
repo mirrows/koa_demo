@@ -95,22 +95,79 @@ router.put('/uploadUrl', async (ctx) => {
 router.post('/queryPicList', async (ctx) => {
   const { path } = ctx.request.body
   const { authorization } = ctx.request.headers
-  const { data } = await req.get(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+  let error = ''
+  const res = await req.get(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: authorization || githubToken,
     },
+  }).catch(err => {
+    error += err
   })
   ctx.body = {
-    code: 0,
-    data: data.reverse().map(f => ({
+    code: error ? 500 : 0,
+    ...(error ? {error} : {data: res?.data.reverse().map(f => ({
       ...f,
       name: f.name.replaceAll('_', '-'),
       cdn_url: f.download_url?.replace(
-        'https://raw.githubusercontent.com/mirrows/photo/main',
-        'https://p.t-n.top/'
+        `https://raw.githubusercontent.com/${gUser}/photo/main`,
+        'https://p.t-n.top'
       )
-    })),
+    }))}),
+  }
+})
+
+router.post('/deletePic', async (ctx) => {
+  // const { content, path } = JSON.parse(ctx.request.body)
+  const { sha, path } = ctx.request.body
+  const { authorization, timestamp } = ctx.request.headers
+  if (!timestamp || Date.now() - timestamp > 5000) {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '非法请求'
+    }
+    return
+  }
+  let error = ''
+  await req.delete(`https://api.github.com/repos/${gUser}/photo/contents/${path.replace('mini', 'normal')}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: githubToken || authorization,
+    },
+    params: {
+      sha,
+      message: `create ${path.split('/')[0]} img`
+    },
+  }).catch(err => {
+    // console.log(err)
+    error += String(err)
+  })
+  const res = await req.delete(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: githubToken || authorization,
+    },
+    params: {
+      sha,
+      message: `create ${path.split('/')[0]} img`
+    },
+  }).catch(err => {
+    // console.log(err)
+    error += String(err)
+  })
+  if (res?.data) {
+    ctx.body = {
+      code: 0,
+      data: res.data,
+    }
+  } else {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '请求出错，请联系管理员',
+      error,
+    }
   }
 })
 
