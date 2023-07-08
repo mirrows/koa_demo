@@ -14,7 +14,15 @@ router.get('/', async (ctx) => {
 router.put('/uploadBase64', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { content, path } = ctx.request.body
-  const { authorization } = ctx.request.headers
+  const { authorization, timestamp } = ctx.request.headers
+  if (!timestamp || Date.now() - timestamp > 5000) {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '非法请求'
+    }
+    return
+  }
   const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
     content,
     message: `create ${path.split('/')[0]} img`
@@ -42,7 +50,15 @@ router.put('/uploadBase64', async (ctx) => {
 
 router.put('/uploadUrl', async (ctx) => {
   const { url, path } = ctx.request.body
-  const { authorization } = ctx.request.headers
+  const { authorization, timestamp } = ctx.request.headers
+  if (!timestamp || Date.now() - timestamp > 5000) {
+    ctx.status = 403
+    ctx.body = {
+      code: 403,
+      msg: '非法请求'
+    }
+    return
+  }
   const base64 = await imgUrlToBase64(url, async (buffer, meta) => {
     const img = sharp(buffer)
     const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
