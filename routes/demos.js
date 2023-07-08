@@ -140,7 +140,7 @@ router.post('/deletePic', async (ctx) => {
       message: `create ${path.split('/')[0]} img`
     },
   }).catch(err => {
-    // console.log(err)
+    console.log(err)
     error += String(err)
   })
   const res = await req.delete(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
@@ -153,7 +153,7 @@ router.post('/deletePic', async (ctx) => {
       message: `create ${path.split('/')[0]} img`
     },
   }).catch(err => {
-    // console.log(err)
+    console.log(err)
     error += String(err)
   })
   if (res?.data) {
