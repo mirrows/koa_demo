@@ -112,7 +112,13 @@ router.post('/queryPicList', async (ctx) => {
       cdn_url: f.download_url?.replace(
         `https://raw.githubusercontent.com/${gUser}/photo/main`,
         'https://p.t-n.top'
-      )
+      ),
+      ...(path.match('mini') ? {
+        normal_url: f.download_url?.replace(
+          `https://raw.githubusercontent.com/${gUser}/photo/main`,
+          'https://p.t-n.top'
+        ).replace('mini', 'normal')
+      } : {})
     }))}),
   }
 })
