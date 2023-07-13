@@ -1,3 +1,19 @@
+### env 配置
+
+NODE_ENV
+# 环境
+GITHUB_SECRET
+# github secret密钥
+GITHUB_CLIENT_ID
+# github client id
+GITHUB_TOKEN
+# github普通使用的token
+GITHUB_USER
+# github 用户名
+CIBA_KEY
+# 词霸api
+
+
 ### 实现功能
 1. 动态路由规则
 接口名=文件夹/文件名（除了index）/对应接口
