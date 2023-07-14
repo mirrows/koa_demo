@@ -23,8 +23,19 @@ router.put('/uploadBase64', async (ctx) => {
     }
     return
   }
+  let realContent = ''
+  if(path.match('mini') && content.length > 1024 * 1024) {
+    let buffer = Buffer.from(content, 'utf-8')
+    const img = sharp(buffer)
+    const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
+    ? img.toBuffer()
+      : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
+    realContent = buf.toString('base64')
+  } else {
+    realContent = content
+  }
   const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
-    content,
+    content: realContent,
     message: `create ${path.split('/')[0]} img`
   }, {
     headers: {
