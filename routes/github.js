@@ -131,46 +131,99 @@ router.get('/queryComments', async (ctx) => {
 router.get('/listArticals', async (ctx) => {
   const { authorization } = ctx.request.headers
   const { number } = ctx.request.query
-  const totalSql = `query { 
-    repository(owner: "mirrows", name: "mirrows.github.io"){
-      issues(filterBy: {labels: ["blog"]}){
-      	totalCount
-      }
-    }
-  }`
-  const totalReq = req.post('https://api.github.com/graphql', {
-    query: totalSql,
-  }, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
-    }
-  })
-  const dataReq = req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues${+String(number) + 1 ? `/${number}` : ''}`, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
-    },
-    params: { labels: 'blog' }
-  }).catch(err => {
-    console.log(err)
-  })
-  const [{value: {data: totalData}}, {value: {data}}] = await Promise.allSettled([totalReq, dataReq])
-  console.log(totalData, data)
-  const total = totalData.data.repository.issues.totalCount
-  const result = (+String(number) + 1?[data]:data)?.map(artical => {
+  if(+String(number) + 1) {
+    // issue详情
+    const data = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}`, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: authorization || githubToken,
+      },
+      params: { labels: 'blog' }
+    }).catch(err => {
+      console.log(err)
+    })
     let msg = {}
     try {
-      msg = JSON.parse(artical.title)
+      msg = JSON.parse(data.data.title)
     } catch {
-      msg = { title: artical.title, img: 'https://empty.t-n.top/pub_lic/2022_09_06/pic1662469258268048.jpg' }
+      msg = { title: data.data?.title || '', img: 'https://empty.t-n.top/pub_lic/2022_09_06/pic1662469258268048.jpg' }
     }
-    return { ...artical, ...msg }
-  })
-  ctx.body = {
-    code: 0,
-    data: +String(number) + 1 ? result[0] : result,
-    total,
+    const result = {
+      ...data.data,
+      ...msg
+    }
+    ctx.body = {
+      code: 0,
+      data: result,
+    }
+  } else {
+    // issue列表
+    const { type, cursor } = ctx.request.query
+    const query = `query{
+      repository(owner: "${gUser}", name: "${gUser}.github.io"){
+        issues(labels: "blog", first: 30,${type ? ` ${type}: "${cursor}",` : ''} orderBy: {field: CREATED_AT, direction: DESC}){
+          totalCount
+          pageInfo{
+            endCursor
+            startCursor
+            hasNextPage
+            hasPreviousPage
+          }
+          nodes{
+            body
+            number
+            state
+            locked
+            id
+            createdAt
+            updatedAt
+            title
+            labels(first: 10){
+              nodes{
+                name
+                color
+                id
+              }
+            }
+            comments{
+              totalCount
+            }
+          }
+        }
+      }
+    }`
+    const data = await req.post('https://api.github.com/graphql', { query }, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: authorization || githubToken,
+      }
+    }).catch((err) => {
+      console.log(err)
+    })
+    const issues = data.data.data.repository.issues
+    const total = issues.totalCount
+    const result = issues.nodes?.map(artical => {
+      let msg = {}
+      try {
+        msg = JSON.parse(artical.title)
+      } catch {
+        msg = { title: artical.title, img: 'https://empty.t-n.top/pub_lic/2022_09_06/pic1662469258268048.jpg' }
+      }
+      return {
+        ...artical,
+        ...msg,
+        labels: artical.labels.nodes,
+        created_at: artical.createdAt,
+        updated_at: artical.updatedAt,
+        comments: artical.comments.totalCount,
+      }
+    })
+    ctx.body = {
+      code: 0,
+      data: result,
+      total,
+      pageInfo: issues.pageInfo
+    }
   }
 })
 
@@ -180,7 +233,7 @@ router.post('/addArtical', async (ctx) => {
   const { data } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues`, params, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
+      Authorization: authorization,
     },
   }).catch(err => {
     console.log(err)
@@ -197,7 +250,7 @@ router.post('/editArtical', async (ctx) => {
   const { data } = await req.patch(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}`, params, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
+      Authorization: authorization,
     },
   }).catch(err => {
     console.log(err)
