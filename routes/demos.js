@@ -77,7 +77,7 @@ router.put('/uploadUrl', async (ctx) => {
       : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
     return buf
   })
-  const realPath = `${path}/${'pic' + Date.now() + String(Math.random()).slice(4, 7) + '.' + base64.metadata.format}`
+  const realPath = `${path}.${base64.metadata.format}`
   const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${realPath}`, {
     content: base64.data,
     message: `create ${realPath.split('/')[0]} img`
