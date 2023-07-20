@@ -56,45 +56,20 @@ router.post('/addComment', async (ctx) => {
 })
 
 router.get('/queryComments', async (ctx) => {
-  const { number, page } = ctx.request.query
+  const { number, type, cursor } = ctx.request.query
   const { authorization } = ctx.request.headers
-  const totalSql = `
-  query { 
-    repository(owner: "${gUser}", name: "${gUser}.github.io"){
-      issue(number: ${number}){
-        comments(first: 30){
-          totalCount
-        }
-      }
-    }
-  }
-  `
-  const { data: totalData } = await req.post('https://api.github.com/graphql', {
-    query: totalSql,
-  }, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: authorization || githubToken,
-    }
-  })
-  // const listReq = req.get(`https://api.github.com/repos/mirrows/mirrows.github.io/issues/${number}/comments`, {
-  //   headers: {
-  //     Accept: "application/vnd.github+json",
-  //     Authorization: authorization || githubToken,
-  //   },
-  //   params: {
-  //     page,
-  //     sort: 'updated',
-  //     direction: 'desc'
-  //   }
-  // })
-  // const [{ value: { data: totalData } }, { value: { data } }] = await Promise.allSettled([totalReq, listReq])
-  const { totalCount } = totalData.data.repository.issue.comments
   const sql = `
-  query { 
-    repository(owner: "${gUser}", name: "${gUser}.github.io"){
+  query{
+    repository(owner: "mirrows", name: "mirrows.github.io"){
       issue(number: ${number}){
-        comments(first: ${totalCount}, orderBy: { direction: DESC, field: UPDATED_AT }){
+        comments(first: 30,${type ? ` ${type}: "${cursor}",` : ''} orderBy: { direction: DESC, field: UPDATED_AT }){
+          totalCount
+          pageInfo{
+            endCursor
+            startCursor
+            hasNextPage
+            hasPreviousPage
+          }
           edges{
             node{
               body
@@ -109,6 +84,7 @@ router.get('/queryComments', async (ctx) => {
           }
         }
       }
+      
     }
   }
   `
@@ -120,11 +96,13 @@ router.get('/queryComments', async (ctx) => {
       Authorization: authorization || githubToken,
     }
   })
-  const list = data.data.repository.issue.comments.edges.map(comment => comment.node)
+  const comments = data.data.repository.issue.comments
+  const list = comments.edges.map(comment => comment.node)
   ctx.body = {
     code: 0,
     data: list,
-    total: totalCount,
+    total: comments.totalCount,
+    pageInfo: comments.pageInfo
   }
 })
 
