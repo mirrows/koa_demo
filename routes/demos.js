@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 const sharp = require('sharp');
-const { githubToken, gUser } = require("../utils/config");
+const { githubToken, gUser, cdnMap } = require("../utils/config");
 const { imgUrlToBase64 } = require('../utils/imgTool');
 const { req } = require("../utils/req")
 
@@ -13,7 +13,7 @@ router.get('/', async (ctx) => {
 
 router.put('/uploadBase64', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
-  const { content, path } = ctx.request.body
+  const { content, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
   if (!timestamp || Date.now() - timestamp > 5000) {
     ctx.status = 403
@@ -34,7 +34,7 @@ router.put('/uploadBase64', async (ctx) => {
   } else {
     realContent = content
   }
-  const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+  const res = await req.put(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
     content: realContent,
     message: `create ${path.split('/')[0]} img`
   }, {
@@ -46,9 +46,16 @@ router.put('/uploadBase64', async (ctx) => {
     console.log(err)
   })
   if (res?.data) {
+    const f = res.data.content
     ctx.body = {
       code: 0,
-      data: res.data,
+      data: {
+        ...f,
+        cdn_url: f.download_url?.replace(
+          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+          cdnMap[mode]
+        ),
+      },
     }
   } else {
     ctx.status = 403
@@ -60,7 +67,7 @@ router.put('/uploadBase64', async (ctx) => {
 })
 
 router.put('/uploadUrl', async (ctx) => {
-  const { url, path } = ctx.request.body
+  const { url, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
   if (!timestamp || Date.now() - timestamp > 5000) {
     ctx.status = 403
@@ -78,7 +85,7 @@ router.put('/uploadUrl', async (ctx) => {
     return buf
   })
   const realPath = `${path}.${base64.metadata.format}`
-  const res = await req.put(`https://api.github.com/repos/${gUser}/photo/contents/${realPath}`, {
+  const res = await req.put(`https://api.github.com/repos/${gUser}/${mode}/contents/${realPath}`, {
     content: base64.data,
     message: `create ${realPath.split('/')[0]} img`
   }, {
@@ -90,9 +97,16 @@ router.put('/uploadUrl', async (ctx) => {
     console.log(err)
   })
   if (res?.data) {
+    const f = res.data.content
     ctx.body = {
       code: 0,
-      data: res.data,
+      data: {
+        ...f,
+        cdn_url: f.download_url?.replace(
+          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+          cdnMap[mode]
+        ),
+      },
     }
   } else {
     ctx.status = 403
@@ -104,10 +118,10 @@ router.put('/uploadUrl', async (ctx) => {
 })
 
 router.post('/queryPicList', async (ctx) => {
-  const { path } = ctx.request.body
+  const { path, mode } = ctx.request.body
   const { authorization } = ctx.request.headers
   let error = ''
-  const res = await req.get(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+  const res = await req.get(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: authorization || githubToken,
@@ -121,13 +135,13 @@ router.post('/queryPicList', async (ctx) => {
       ...f,
       name: f.name.replaceAll('_', '-'),
       cdn_url: f.download_url?.replace(
-        `https://raw.githubusercontent.com/${gUser}/photo/main`,
-        'https://p.t-n.top'
+        `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+        cdnMap[mode]
       ),
       ...(path.match('mini') ? {
         normal_url: f.download_url?.replace(
-          `https://raw.githubusercontent.com/${gUser}/photo/main`,
-          'https://p.t-n.top'
+          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+          cdnMap[mode]
         ).replace('mini', 'normal')
       } : {})
     }))}),
@@ -136,7 +150,7 @@ router.post('/queryPicList', async (ctx) => {
 
 router.post('/deletePic', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
-  const { sha, path } = ctx.request.body
+  const { sha, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
   if (!timestamp || Date.now() - timestamp > 5000) {
     ctx.status = 403
@@ -147,7 +161,7 @@ router.post('/deletePic', async (ctx) => {
     return
   }
   let error = ''
-  await req.delete(`https://api.github.com/repos/${gUser}/photo/contents/${path.replace('mini', 'normal')}`, {
+  await req.delete(`https://api.github.com/repos/${gUser}/${mode}/contents/${path.replace('mini', 'normal')}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: githubToken || authorization,
@@ -160,7 +174,7 @@ router.post('/deletePic', async (ctx) => {
     console.log(err)
     error += String(err)
   })
-  const res = await req.delete(`https://api.github.com/repos/${gUser}/photo/contents/${path}`, {
+  const res = await req.delete(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: githubToken || authorization,

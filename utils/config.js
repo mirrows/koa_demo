@@ -8,5 +8,8 @@ module.exports = {
   githubToken: process.env.GITHUB_TOKEN,
   useGitee: process.env.USE_GITEE,
   gUser: process.env.GITHUB_USER,
-
+  cdnMap: {
+    photo: process.env.PIC_CDN,
+    private: process.env.PRIVATE_CDN
+  }
 }
