@@ -37,7 +37,7 @@ router.post('/token', async (ctx, next) => {
 })
 
 router.post('/addComment', async (ctx) => {
-  const { number, body } = JSON.parse(ctx.request.body)
+  const { number, body } = ctx.request.body
   const { authorization } = ctx.request.headers
   const { data } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}/comments`, {
     body,
