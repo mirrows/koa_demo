@@ -206,7 +206,7 @@ router.get('/listArticals', async (ctx) => {
 })
 
 router.post('/addArtical', async (ctx) => {
-  const params = JSON.parse(ctx.request.body)
+  const params = ctx.request.body
   const { authorization } = ctx.request.headers
   const { data } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues`, params, {
     headers: {
@@ -223,7 +223,7 @@ router.post('/addArtical', async (ctx) => {
 })
 
 router.post('/editArtical', async (ctx) => {
-  const { number, ...params } = JSON.parse(ctx.request.body)
+  const { number, ...params } = ctx.request.body
   const { authorization } = ctx.request.headers
   const { data } = await req.patch(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}`, params, {
     headers: {
