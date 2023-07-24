@@ -3,7 +3,7 @@ const { req } = require('../utils/req');
 const router = require('koa-router')(); //引入并实例化
 
 router.post('/token', async (ctx, next) => {
-  const { code } = JSON.parse(ctx.request.body)
+  const { code } = ctx.request.body
   if (!code) {
     ctx.status = 403
     return ctx.body = {
