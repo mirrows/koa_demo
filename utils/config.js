@@ -12,5 +12,6 @@ module.exports = {
     photo: process.env.PIC_CDN,
     private: process.env.PRIVATE_CDN
   },
+  dbName: process.env.DBNAME,
   mongoUri: process.env.MONGO_URI,
 }

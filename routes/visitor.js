@@ -1,5 +1,4 @@
-const { githubToken, gUser, mongoUri } = require('../utils/config');
-const { req } = require('../utils/req');
+const { mongoUri, dbName } = require('../utils/config');
 const router = require('koa-router')(); //引入并实例化
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = mongoUri;
@@ -22,7 +21,7 @@ const dataBase = {
 router.get('/', async (ctx) => {
   const { ip } = ctx.request.query
   const date = new Date().toLocaleDateString()
-  const cl = client.db("ips").collection('list')
+  const cl = client.db(dbName).collection('ips')
   const curIp = await cl.findOne({ip, date})
   if(!curIp) {
     await cl.insertOne({ip, date, time: 1})
@@ -87,7 +86,7 @@ router.get('/', async (ctx) => {
 router.post('/', async (ctx) => {
   const { time = 1, ip } = ctx.request.body
   const date = new Date().toLocaleDateString()
-  const cl = client.db("ips").collection('list')
+  const cl = client.db(dbName).collection("ips")
   const curIp = await cl.findOne({ip, date})
   if(!curIp) {
     await cl.insertOne({ip, date, time})
@@ -95,7 +94,6 @@ router.post('/', async (ctx) => {
     await cl.updateOne({ip, date}, {$inc: {time}})
   }
   const data = await cl.find().toArray()
-  console.log(ctx.request.body, typeof ctx.request.body, data)
   ctx.body = {
     code: 0,
     msg: 'success',
