@@ -1,3 +1,4 @@
+const { randomString } = require('../utils/common');
 const { githubClientID, githubSecret, githubToken, gUser } = require('../utils/config');
 const { req } = require('../utils/req');
 const router = require('koa-router')(); //引入并实例化
@@ -97,7 +98,27 @@ router.get('/queryComments', async (ctx) => {
     }
   })
   const comments = data.data.repository.issue.comments
-  const list = comments.edges.map(comment => comment.node)
+  const list = comments.edges.map(comment => {
+    let result = {
+      ...comment.node,
+    }
+    let author = comment.node.author
+    try {
+      const { body, ...actor } = JSON.parse(result.body)
+      if(!body) {throw Error('数字会被解析的')}
+      author = actor
+      author.avatarUrl = actor.avatarUrl || `https://ui-avatars.com/api/?name=${author.login}`
+      result.body = body
+    } catch {
+      if (gUser === author.login) {
+        author.login = randomString()
+        author.avatarUrl = `https://ui-avatars.com/api/?name=${author.login}`
+        author.email = ''
+      }
+    }
+    result.author = author
+    return result
+  })
   ctx.body = {
     code: 0,
     data: list,
