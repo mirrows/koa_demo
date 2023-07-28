@@ -29,7 +29,7 @@ router.put('/uploadBase64', async (ctx) => {
     const img = sharp(buffer)
     const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
     ? img.toBuffer()
-      : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
+      : img[meta.format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
     realContent = buf.toString('base64')
   } else {
     realContent = content

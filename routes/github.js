@@ -260,5 +260,34 @@ router.post('/editArtical', async (ctx) => {
   }
 })
 
+router.get('/pics', async (ctx) => {
+  const { data } = await req.get(`https://api.github.com/repos/huaasto/pics/contents`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: 'token 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',
+    },
+  }).catch(err => {
+    console.log(err)
+  })
+  data.reverse()
+  const items = {}
+  for(let i = 0; i < data.length; i++) {
+    if(data[i].download_url) continue
+    const { data: resItems } = await req.get(`https://api.github.com/repos/huaasto/pics/contents/${data[i].path}`, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: 'token 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',
+      },
+    }).catch(err => {
+      console.log(err)
+    })
+    items[data[i].path] = resItems
+  }
+  ctx.body = {
+    code: 0,
+    data: items
+  }
+})
+
 module.exports = router;
 
