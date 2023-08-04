@@ -29,7 +29,7 @@ router.put('/uploadBase64', async (ctx) => {
     const img = sharp(buffer)
     const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
     ? img.toBuffer()
-      : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
+      : img[meta.format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
     realContent = buf.toString('base64')
   } else {
     realContent = content
@@ -81,10 +81,11 @@ router.put('/uploadUrl', async (ctx) => {
     const img = sharp(buffer)
     const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
     ? img.toBuffer()
-      : img[meta.format]({ quality: path.match('mini') ? 10 : 80 }).toBuffer());
+      : img[meta.format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
     return buf
   })
-  const realPath = `${path}.${base64.metadata.format}`
+  const isPrivateName = path.split('.').length > 1
+  const realPath = `${path}${isPrivateName ? '' : `.${base64.metadata.format}`}`
   const res = await req.put(`https://api.github.com/repos/${gUser}/${mode}/contents/${realPath}`, {
     content: base64.data,
     message: `create ${realPath.split('/')[0]} img`
