@@ -261,10 +261,10 @@ router.post('/editArtical', async (ctx) => {
 })
 
 router.get('/pics', async (ctx) => {
-  const { data } = await req.get(`https://api.github.com/repos/huaasto/pics/contents`, {
+  const { data } = await req.get(`https://api.github.com/repos/huaasto/empty/contents/pro`, {
     headers: {
       Accept: "application/vnd.github+json",
-      Authorization: 'token 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',
+      Authorization: 'token',
     },
   }).catch(err => {
     console.log(err)
@@ -273,10 +273,10 @@ router.get('/pics', async (ctx) => {
   const items = {}
   for(let i = 0; i < data.length; i++) {
     if(data[i].download_url) continue
-    const { data: resItems } = await req.get(`https://api.github.com/repos/huaasto/pics/contents/${data[i].path}`, {
+    const { data: resItems } = await req.get(`https://api.github.com/repos/huaasto/empty/contents/${data[i].path}`, {
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: 'token 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',
+        Authorization: 'token',
       },
     }).catch(err => {
       console.log(err)
