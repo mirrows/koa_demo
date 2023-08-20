@@ -25,7 +25,7 @@ router.put('/uploadBase64', async (ctx) => {
     return
   }
   let realContent = ''
-  if(path.match('mini') && content.length > 1024 * 1024) {
+  if(content.length > 1024 * 1024) {
     let buffer = Buffer.from(content, 'utf-8')
     const img = sharp(buffer)
     const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
