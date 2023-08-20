@@ -3,6 +3,7 @@ const sharp = require('sharp');
 const { githubToken, gUser, cdnMap } = require("../utils/config");
 const { imgUrlToBase64 } = require('../utils/imgTool');
 const { req } = require("../utils/req")
+const illegalTime = 1000 * 60 * 3
 
 router.get('/', async (ctx) => {
   ctx.body = {
@@ -15,7 +16,7 @@ router.put('/uploadBase64', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { content, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > 5000) {
+  if (!timestamp || Date.now() - timestamp > illedgalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
@@ -69,7 +70,7 @@ router.put('/uploadBase64', async (ctx) => {
 router.put('/uploadUrl', async (ctx) => {
   const { url, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > 5000) {
+  if (!timestamp || Date.now() - timestamp > illedgalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
@@ -153,7 +154,7 @@ router.post('/deletePic', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { sha, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > 5000) {
+  if (!timestamp || Date.now() - timestamp > illedgalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
