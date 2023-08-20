@@ -96,6 +96,10 @@ router.put('/uploadUrl', async (ctx) => {
     },
   }).catch(err => {
     console.log(err)
+    return {
+      code: 500,
+      err
+    }
   })
   if (res?.data) {
     const f = res.data.content
@@ -113,7 +117,8 @@ router.put('/uploadUrl', async (ctx) => {
     ctx.status = 403
     ctx.body = {
       code: 403,
-      msg: '请求出错，请联系管理员'
+      msg: '请求出错，请联系管理员',
+      err: res
     }
   }
 })
