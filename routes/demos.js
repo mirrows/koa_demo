@@ -16,11 +16,12 @@ router.put('/uploadBase64', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { content, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > illedgalTime) {
+  const current = Date.now()
+  if (!timestamp || current - timestamp > illedgalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
-      msg: '非法请求'
+      msg: `请求时间过长，it starts at ${new Date(timestamp).toLocaleString()} but now is ${new Date(current).toLocaleString()},`
     }
     return
   }
@@ -70,11 +71,12 @@ router.put('/uploadBase64', async (ctx) => {
 router.put('/uploadUrl', async (ctx) => {
   const { url, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > illedgalTime) {
+  const current = Date.now()
+  if (!timestamp || current - timestamp > illedgalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
-      msg: '非法请求'
+      msg: `请求时间过长，it starts at ${new Date(timestamp).toLocaleString()} but now is ${new Date(current).toLocaleString()},`
     }
     return
   }
