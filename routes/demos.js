@@ -145,6 +145,36 @@ router.post('/queryPicList', async (ctx) => {
   }
 })
 
+
+router.post('/queryPic', async (ctx) => {
+  const { path, mode } = ctx.request.body
+  const { authorization } = ctx.request.headers
+  let error = ''
+  const res = await req.get(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: authorization || githubToken,
+    },
+  }).catch(err => {
+    error += err
+  })
+  ctx.body = {
+    code: 0,
+    ...(error || !res?.data ?
+      {
+        error, data: []
+      } : {
+        data: ({
+          ...(res.data || {}),
+          cdn_url: res.data.download_url?.replace(
+            `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+            cdnMap[mode]
+          ),
+        })
+      }),
+  }
+})
+
 router.post('/deletePic', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { sha, path, mode } = ctx.request.body
