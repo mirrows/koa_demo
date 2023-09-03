@@ -63,7 +63,8 @@ router.put('/uploadBase64', async (ctx) => {
     ctx.status = 403
     ctx.body = {
       code: 403,
-      msg: '请求出错，请联系管理员'
+      msg: '请求出错，请联系管理员',
+      err: res,
     }
   }
 })
@@ -116,7 +117,9 @@ router.put('/uploadUrl', async (ctx) => {
     ctx.status = 403
     ctx.body = {
       code: 403,
-      msg: '请求出错，请联系管理员'
+      msg: '请求出错，请联系管理员',
+      err: res,
+
     }
   }
 })
