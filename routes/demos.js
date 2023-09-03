@@ -25,19 +25,8 @@ router.put('/uploadBase64', async (ctx) => {
     }
     return
   }
-  let realContent = ''
-  if(content.length > 1024 * 1024) {
-    let buffer = Buffer.from(content, 'utf-8')
-    const img = sharp(buffer)
-    const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
-    ? img.toBuffer()
-      : img[meta.format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
-    realContent = buf.toString('base64')
-  } else {
-    realContent = content
-  }
   const res = await req.put(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
-    content: realContent,
+    content: content,
     message: `create ${path.split('/')[0]} img`
   }, {
     headers: {
@@ -83,9 +72,10 @@ router.put('/uploadUrl', async (ctx) => {
   }
   const base64 = await imgUrlToBase64(url, async (buffer, meta) => {
     const img = sharp(buffer)
-    const buf = await (['gif', 'raw', 'tile'].includes(meta.format)
+    const format = (meta?.format || path.split('.')[1] || 'jpeg').replace('jpg', 'jpeg')
+    const buf = await (['gif', 'raw', 'tile', 'webp'].includes(format)
     ? img.toBuffer()
-      : img[meta.format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
+      : img[format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
     return buf
   })
   const isPrivateName = path.split('.').length > 1
@@ -137,8 +127,8 @@ router.post('/queryPicList', async (ctx) => {
     error += err
   })
   ctx.body = {
-    code: error ? 500 : 0,
-    ...(error ? {error} : {data: res?.data.reverse().map(f => ({
+    code: 0,
+    ...(error ? {error, data: []} : {data: (Array.isArray(res?.data)?res?.data : []).reverse().map(f => ({
       ...f,
       name: f.name.replaceAll('_', '-'),
       cdn_url: f.download_url?.replace(
@@ -168,18 +158,18 @@ router.post('/deletePic', async (ctx) => {
     return
   }
   let error = ''
-  await req.delete(`https://api.github.com/repos/${gUser}/${mode}/contents/${path.replace('mini', 'normal')}`, {
+  await req.delete(`https://api.github.com/repos/${gUser}/${mode}/contents/${path.replace('normal', 'mini')}`, {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: githubToken || authorization,
     },
     params: {
       sha,
-      message: `create ${path.split('/')[0]} img`
+      message: `delete ${path.split('/')[0]} img`
     },
   }).catch(err => {
     console.log(err)
-    error += String(err)
+    error += `mini: ${String(err)}, `
   })
   const res = await req.delete(`https://api.github.com/repos/${gUser}/${mode}/contents/${path}`, {
     headers: {
@@ -188,11 +178,11 @@ router.post('/deletePic', async (ctx) => {
     },
     params: {
       sha,
-      message: `create ${path.split('/')[0]} img`
+      message: `delete ${path.split('/')[0]} img`
     },
   }).catch(err => {
     console.log(err)
-    error += String(err)
+    error += `normal: ${String(err)}`
   })
   if (res?.data) {
     ctx.body = {
