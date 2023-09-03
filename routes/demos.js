@@ -17,7 +17,7 @@ router.put('/uploadBase64', async (ctx) => {
   const { content, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
   const current = Date.now()
-  if (!timestamp || current - timestamp > illedgalTime) {
+  if (!timestamp || current - timestamp > illegalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
@@ -73,7 +73,7 @@ router.put('/uploadUrl', async (ctx) => {
   const { url, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
   const current = Date.now()
-  if (!timestamp || current - timestamp > illedgalTime) {
+  if (!timestamp || current - timestamp > illegalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
@@ -159,7 +159,7 @@ router.post('/deletePic', async (ctx) => {
   // const { content, path } = JSON.parse(ctx.request.body)
   const { sha, path, mode } = ctx.request.body
   const { authorization, timestamp } = ctx.request.headers
-  if (!timestamp || Date.now() - timestamp > illedgalTime) {
+  if (!timestamp || Date.now() - timestamp > illegalTime) {
     ctx.status = 403
     ctx.body = {
       code: 403,
