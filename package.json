@@ -6,7 +6,6 @@
     "prd": "pm2 start index.js"
   },
   "dependencies": {
-    "@img/sharp-win32-x64": "^0.33.3",
     "axios": "^1.3.4",
     "compressorjs": "^1.2.1",
     "crypto": "^1.0.1",
@@ -24,5 +23,8 @@
   "main": "index.js",
   "keywords": [],
   "author": "",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@img/sharp-win32-x64": "^0.33.3"
+  }
 }
