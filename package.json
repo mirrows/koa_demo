@@ -6,8 +6,10 @@
     "prd": "pm2 start index.js"
   },
   "dependencies": {
+    "@img/sharp-win32-x64": "^0.33.3",
     "axios": "^1.3.4",
     "compressorjs": "^1.2.1",
+    "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "koa": "^2.14.1",
     "koa-body": "^6.0.1",

@@ -42,7 +42,7 @@ router.get('/search', async ctx => {
 })
 
 router.get('/song', async ctx => {
-  const { hash } = ctx.request.query
+  const { id: hash } = ctx.request.query
   const { status, data } = await req.get('http://m.kugou.com/app/i/getSongInfo.php', {
     params: {
       cmd: 'playInfo',
