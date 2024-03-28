@@ -23,8 +23,5 @@
   "main": "index.js",
   "keywords": [],
   "author": "",
-  "description": "",
-  "devDependencies": {
-    "@img/sharp-win32-x64": "^0.33.3"
-  }
+  "description": ""
 }
