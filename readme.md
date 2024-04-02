@@ -13,10 +13,6 @@ GITHUB_USER
 CIBA_KEY
 # 词霸api
 
-,
-  "devDependencies": {
-    "@img/sharp-win32-x64": "^0.33.3"
-  }
 
 
 ### 实现功能

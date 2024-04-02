@@ -36,6 +36,11 @@ router.get('/', ctx => {
 
 router.get('/newsong', async ctx => {
   const { all = false } = ctx.request.query
+  const cacheKey = `qq_newsong_${all}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { all: allType, ...otherType } = langMap
   const data = await Promise.allSettled((all ? ['all'] : Object.keys(otherType)).map((type) => req.get(`https://u.y.qq.com/cgi-bin/musicu.fcg`, {
     ...options,
@@ -56,15 +61,22 @@ router.get('/newsong', async ctx => {
   })))
   // const list = data.filter(songs => songs.status === 'fulfilled').map(songs => songs || [])
   const list = data.filter(songs => songs.status === 'fulfilled').map(songs => songs?.value?.data?.new_song?.data?.songlist || [])
-  ctx.body = {
+  const body = {
     code: 0,
     data: list,
   }
+  cache.set(cacheKey, body, 60 * 12);
+  ctx.body = body;
 })
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
-    const { status, data: { data } } = await req.get(type === 'playlist' ? 'https://c.y.qq.com/soso/fcgi-bin/client_music_search_songlist' : 'http://c.y.qq.com/soso/fcgi-bin/client_search_cp', {
+  const cacheKey = `qq_search_${keyword}_${page}_${pagesize}_${type}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
+  const { status, data: { data } } = await req.get(type === 'playlist' ? 'https://c.y.qq.com/soso/fcgi-bin/client_music_search_songlist' : 'http://c.y.qq.com/soso/fcgi-bin/client_search_cp', {
     ...options,
     params: type === 'playlist' ? {
       format: 'json',
@@ -81,10 +93,12 @@ router.get('/search', async ctx => {
     }
   })
   if (status === 200) {
-    ctx.body = {
+    const body = {
       code: 0,
       data: (type === 'playlist' ? data : data?.song)?.list?.filter(song => song?.pay?.payplay !== 1) || [],
     }
+    cache.set(cacheKey, body, 120);
+    ctx.body = body;
   } else {
     ctx.status = 500
     ctx.body = {

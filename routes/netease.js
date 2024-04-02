@@ -37,6 +37,11 @@ router.get('/', ctx => {
 
 router.get('/newsong', async ctx => {
   const { all = false, page = 1, pagesize = (all ? 100 : 30) } = ctx.request.query
+  const cacheKey = `netease_newsong_${page}_${pagesize}_${all}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { 0 : allType , ...otherType } = langMap
   const data = await Promise.allSettled((all ? [0] : Object.keys(otherType)).map((type) => req.post(`https://music.163.com/weapi/v1/discovery/new/songs`, new URLSearchParams(encrypt.weapi({
     areaId: type, // 全部:0 华语:7 欧美:96 日本:8 韩国:16
@@ -45,14 +50,21 @@ router.get('/newsong', async ctx => {
     // ...(all ? { total: true } : {}),
   })).toString(), options)))
   const list = data.filter(songs => songs.status === 'fulfilled').map(songs => songs.value.data?.data?.filter(song => song.fee !== 1).map(song => ({ ...song, url: `https://music.163.com/song/media/outer/url?id=${song.id}.mp3` })) || [])
-  ctx.body = {
+  const body = {
     code: 0,
     data: list,
   }
+  cache.set(cacheKey, body, 60 * 12);
+  ctx.body = body;
 })
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
+  const cacheKey = `netease_search_${keyword}_${page}_${pagesize}_${type}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { status, data: { result: data } } = await req.post('https://music.163.com/weapi/search/get', new URLSearchParams(encrypt.weapi({
     s: keyword,
     type: typeMap[type], // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
@@ -60,10 +72,12 @@ router.get('/search', async ctx => {
     offset: (page - 1) * pagesize,
   })).toString(), options)
   if (status === 200) {
-    ctx.body = {
+    const body = {
       code: 0,
       data: data?.songs?.filter(song => song.fee !== 1).map(song => ({ ...song, url: `https://music.163.com/song/media/outer/url?id=${song.id}.mp3` })) || [],
     }
+    cache.set(cacheKey, body, 120);
+    ctx.body = body;
   } else {
     ctx.status = 500
     ctx.body = {

@@ -1,3 +1,4 @@
+const { curCache } = require('../utils/cache');
 const { req } = require('../utils/req');
 
 const router = require('koa-router')(); //引入并实例化
@@ -8,17 +9,29 @@ router.get('/', ctx => {
 
 router.get('/newsong', async ctx => {
   // const { n = 1 } = ctx.request.query
+  const cacheKey = `kugou_newsong`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const data = await Promise.allSettled([...Array(4)].map((_, i) => req.get(`https://m.kugou.com/newsong/index/${i+1}?json=true`, { params: { json: true } })))
   const list = data.filter(songs => songs.status === 'fulfilled').map(songs => songs.value.data?.newSongList?.filter(e => e.trans_param?.musicpack_advance !== 1) || [])
   // const { status, data: { newSongList } } = await req.get(`https://m.kugou.com/newsong/index/${n}?json=true`, { params: { json: true } })
-  ctx.body = {
+  const body = {
     code: 0,
     data: list,
   }
+  cache.set(cacheKey, body, 60 * 12);
+  ctx.body = body;
 })
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30 } = ctx.request.query
+  const cacheKey = `kugou_search_${keyword}_${page}_${pagesize}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { status, data: { data } } = await req.get('http://mobilecdn.kugou.com/api/v3/search/song', {
     params: {
       format: 'json',
@@ -28,10 +41,12 @@ router.get('/search', async ctx => {
     },
   })
   if (status === 200) {
-    ctx.body = {
+    const body = {
       code: 0,
       data: data?.info?.filter(e => e.trans_param?.musicpack_advance !== 1) || []
     }
+    cache.set(cacheKey, body, 120);
+    ctx.body = body;
   } else {
     ctx.status = 500
     ctx.body = {

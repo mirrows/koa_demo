@@ -25,6 +25,11 @@ router.get('/', ctx => {
 
 router.get('/newsong', async ctx => {
   const { page = 1, pagesize = 30 } = ctx.request.query
+  const cacheKey = `migu_newsong_${page}_${pagesize}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { status, data: { result: data } } = await req.get('http://m.music.migu.cn/migu/remoting/cms_list_tag', {
     ...options,
     params: {
@@ -34,11 +39,13 @@ router.get('/newsong', async ctx => {
     },
   })
   if (status === 200) {
-    ctx.body = {
+    const body = {
       code: 0,
       // data,
       data: data?.results?.filter(e => e.songData?.listenUrl) || []
     }
+    cache.set(cacheKey, body, 60 * 12);
+    ctx.body = body;
   } else {
     ctx.status = 500
     ctx.body = {
@@ -50,6 +57,11 @@ router.get('/newsong', async ctx => {
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
+  const cacheKey = `migu_search_${keyword}_${page}_${pagesize}_${type}`;
+  const cacheData = curCache.get(cacheKey);
+  if (cacheData) {
+    return ctx.body = cacheData;
+  }
   const { status, data } = await req.get('https://m.music.migu.cn/migu/remoting/scr_search_tag', {
     ...options,
     params: {
@@ -60,10 +72,12 @@ router.get('/search', async ctx => {
     },
   })
   if (status === 200) {
-    ctx.body = {
+    const body = {
       code: 0,
       data: data?.musics?.filter(e => e.mp3) || []
     }
+    ache.set(cacheKey, body, 120);
+    ctx.body = body;
   } else {
     ctx.status = 500
     ctx.body = {
