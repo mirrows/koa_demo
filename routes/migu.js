@@ -1,3 +1,4 @@
+const { curCache } = require('../utils/cache');
 const { req } = require('../utils/req');
 
 const router = require('koa-router')(); //引入并实例化
@@ -44,7 +45,7 @@ router.get('/newsong', async ctx => {
       // data,
       data: data?.results?.filter(e => e.songData?.listenUrl) || []
     }
-    cache.set(cacheKey, body, 60 * 12);
+    curCache.set(cacheKey, body, 60 * 12);
     ctx.body = body;
   } else {
     ctx.status = 500
@@ -76,7 +77,7 @@ router.get('/search', async ctx => {
       code: 0,
       data: data?.musics?.filter(e => e.mp3) || []
     }
-    ache.set(cacheKey, body, 120);
+    curCache.set(cacheKey, body, 120);
     ctx.body = body;
   } else {
     ctx.status = 500

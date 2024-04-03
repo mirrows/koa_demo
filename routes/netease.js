@@ -1,3 +1,4 @@
+const { curCache } = require('../utils/cache');
 const { req } = require('../utils/req');
 const encrypt = require('../utils/crypto')
 
@@ -54,7 +55,7 @@ router.get('/newsong', async ctx => {
     code: 0,
     data: list,
   }
-  cache.set(cacheKey, body, 60 * 12);
+  curCache.set(cacheKey, body, 60 * 12);
   ctx.body = body;
 })
 
@@ -76,7 +77,7 @@ router.get('/search', async ctx => {
       code: 0,
       data: data?.songs?.filter(song => song.fee !== 1).map(song => ({ ...song, url: `https://music.163.com/song/media/outer/url?id=${song.id}.mp3` })) || [],
     }
-    cache.set(cacheKey, body, 120);
+    curCache.set(cacheKey, body, 120);
     ctx.body = body;
   } else {
     ctx.status = 500

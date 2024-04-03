@@ -4,7 +4,17 @@ const https = require("https");
 const agent = new https.Agent({
   rejectUnauthorized: false
 });
-// 创建实例时配置默认值
-exports.req = axios.create({
+
+const req = axios.create({
   httpsAgent: agent
 });
+
+req.interceptors.request.use(config => {
+  console.log(config.url);
+  return config;
+}, err => {
+  console.log('req error:', err);
+});
+
+// 创建实例时配置默认值
+exports.req = req;

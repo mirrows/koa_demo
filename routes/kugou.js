@@ -21,7 +21,7 @@ router.get('/newsong', async ctx => {
     code: 0,
     data: list,
   }
-  cache.set(cacheKey, body, 60 * 12);
+  curCache.set(cacheKey, body, 60 * 12);
   ctx.body = body;
 })
 
@@ -45,7 +45,7 @@ router.get('/search', async ctx => {
       code: 0,
       data: data?.info?.filter(e => e.trans_param?.musicpack_advance !== 1) || []
     }
-    cache.set(cacheKey, body, 120);
+    curCache.set(cacheKey, body, 120);
     ctx.body = body;
   } else {
     ctx.status = 500
