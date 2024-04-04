@@ -27,10 +27,10 @@ const langMap = {
 
 const getCookie = () => {
   const org = {
-    "anonymous_token": "bf8bfeabb1aa84f9c8c3906c04a04fb864322804c83f5d607e91a04eae463c9436bd1a17ec353cf780b396507a3f7464e8a60f4bbc019437993166e004087dd32d1490298caf655c2353e58daa0bc13cc7d5c198250968580b12c1b8817e3f5c807e650dd04abd3fb8130b7ae43fcc5b",
     __remember_me: true,
     NMTID: crypto.randomBytes(16).toString('hex'),
-    _ntes_nuid: crypto.randomBytes(16).toString('hex')
+    _ntes_nuid: crypto.randomBytes(16).toString('hex'),
+    MUSIC_A: "bf8bfeabb1aa84f9c8c3906c04a04fb864322804c83f5d607e91a04eae463c9436bd1a17ec353cf780b396507a3f7464e8a60f4bbc019437993166e004087dd32d1490298caf655c2353e58daa0bc13cc7d5c198250968580b12c1b8817e3f5c807e650dd04abd3fb8130b7ae43fcc5b",
   }
   return Object.keys(org)
   .map(
