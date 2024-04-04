@@ -140,6 +140,9 @@ router.get('/song', async ctx => {
   const guid = (Math.random() * 10000000).toFixed(0);
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
+    headers:{
+      Cookie: 'uin=',
+    },
     params: {
       '-': 'getplaysongvkey',
       g_tk: 5381,
