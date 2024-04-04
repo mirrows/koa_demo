@@ -134,7 +134,7 @@ const quarityMap = {
 
 router.get('/song', async ctx => {
   const { id, mediaId = id, type = '128' } = ctx.request.query
-  let { uin, qqmusic_key } = {};
+  let { uin, qqmusic_key } = { uin: '0' };
 
   const typeObj = quarityMap[type];
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
@@ -156,7 +156,6 @@ router.get('/song', async ctx => {
       loginUin: uin,
       hostUin: 0,
       format: 'json',
-      sign: 'zzannc1o6o9b4i971602f3554385022046ab796512b7012',
       inCharset: 'utf8',
       outCharset: 'utf-8-ice=0',  
       platform: 'yqq.json',
