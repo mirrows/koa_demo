@@ -158,7 +158,7 @@ router.get('/song', async ctx => {
       format: 'json',
       sign: 'zzannc1o6o9b4i971602f3554385022046ab796512b7012',
       inCharset: 'utf8',
-      outCharset: 'utf-8-ice=0',
+      outCharset: 'utf-8-ice=0',  
       platform: 'yqq.json',
       needNewCode: 0,
       data: JSON.stringify({
