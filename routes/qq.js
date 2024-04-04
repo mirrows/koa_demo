@@ -139,8 +139,17 @@ router.get('/song', async ctx => {
   const typeObj = quarityMap[type];
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
   const guid = (Math.random() * 10000000).toFixed(0);
+  let ip = ctx.request.ip;
+  if (ip.substr(0, 7) == '::ffff:') {
+    ip = ip.substr(7)
+  }
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
+    headers: {
+      'Referer': 'https://y.qq.com',
+      'X-Real-IP': ip,
+      'X-Forwarded-For': ip,
+    },
     params: {
       '-': 'getplaysongvkey',
       g_tk: 5381,
