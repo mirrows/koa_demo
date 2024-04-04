@@ -149,7 +149,7 @@ router.get('/song', async ctx => {
       hostUin: 0,
       format: 'json',
       inCharset: 'utf8',
-      outCharset: 'utf-8¬ice=0',
+      outCharset: 'utf-8-ice=0',
       platform: 'yqq.json',
       needNewCode: 0,
       data: JSON.stringify({
@@ -173,6 +173,7 @@ router.get('/song', async ctx => {
       }),
     },
   })
+  console.log(555, data);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
