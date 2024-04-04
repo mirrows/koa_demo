@@ -152,7 +152,7 @@ router.get('/song', async ctx => {
     },
     params: {
       '-': 'getplaysongvkey',
-      g_tk: 5381,
+      // g_tk: 5381,
       loginUin: uin,
       hostUin: 0,
       format: 'json',
