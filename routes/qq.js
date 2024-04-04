@@ -173,7 +173,8 @@ router.get('/song', async ctx => {
       }),
     },
   })
-  console.log(555, data);
+  console.log(555, data?.req_0?.data?.sip);
+  console.log(777, data?.req_0?.data?.midurlinfo?.[0]);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
