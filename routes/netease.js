@@ -1,6 +1,9 @@
 const { curCache } = require('../utils/cache');
 const { req } = require('../utils/req');
 const encrypt = require('../utils/crypto')
+const crypto = require('crypto')
+const http = require('http')
+const https = require('https')
 
 const router = require('koa-router')(); //引入并实例化
 // 
@@ -21,6 +24,23 @@ const langMap = {
   8: 'jp',
   16: 'ko',
 };
+
+const getCookie = () => {
+  const org = {
+    "anonymous_token": "bf8bfeabb1aa84f9c8c3906c04a04fb864322804c83f5d607e91a04eae463c9436bd1a17ec353cf780b396507a3f7464e8a60f4bbc019437993166e004087dd32d1490298caf655c2353e58daa0bc13cc7d5c198250968580b12c1b8817e3f5c807e650dd04abd3fb8130b7ae43fcc5b",
+    __remember_me: true,
+    NMTID: crypto.randomBytes(16).toString('hex'),
+    _ntes_nuid: crypto.randomBytes(16).toString('hex')
+  }
+  return Object.keys(org)
+  .map(
+    (key) =>
+      encodeURIComponent(key) +
+      '=' +
+      encodeURIComponent(org[key]),
+  )
+  .join('; ')
+}
 
 
 const options = {
@@ -69,12 +89,25 @@ router.get('/search', async ctx => {
   if (cacheData) {
     return ctx.body = cacheData;
   }
+  let ip = ctx.request.ip;
+  if (ip.substr(0, 7) == '::ffff:') {
+    ip = ip.substr(7)
+  }
+  console.log(getCookie(), ip)
   const { status, data: { result: data } } = await req.post('https://music.163.com/weapi/search/get', new URLSearchParams(encrypt.weapi({
     s: keyword,
     type: typeMap[type], // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
     limit: pagesize,
     offset: (page - 1) * pagesize,
-  })).toString(), options)
+  })).toString(), {
+    ...options,
+    headers: {
+      ...options.headers,
+      'X-Real-IP': ip,
+      'X-Forwarded-For': ip,
+      Cookie: getCookie(),
+    }
+  })
   if (status === 200) {
     const body = {
       code: 0,
