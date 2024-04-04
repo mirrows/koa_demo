@@ -83,7 +83,6 @@ router.get('/newsong', async ctx => {
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
-  console.log(555, keyword);
   const cacheKey = `netease_search_${keyword}_${page}_${pagesize}_${type}`;
   const cacheData = curCache.get(cacheKey);
   if (cacheData) {
@@ -93,7 +92,6 @@ router.get('/search', async ctx => {
   if (ip.substr(0, 7) == '::ffff:') {
     ip = ip.substr(7)
   }
-  console.log(getCookie(), ip)
   const { status, data: { result: data } } = await req.post('https://music.163.com/weapi/search/get', new URLSearchParams(encrypt.weapi({
     s: keyword,
     type: typeMap[type], // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
