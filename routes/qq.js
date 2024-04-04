@@ -134,18 +134,17 @@ const quarityMap = {
 
 router.get('/song', async ctx => {
   const { id, mediaId = id, type = '128' } = ctx.request.query
+  let { uin, qqmusic_key } = {};
 
   const typeObj = quarityMap[type];
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
   const guid = (Math.random() * 10000000).toFixed(0);
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
-    headers:{
-      Cookie: 'uin=',
-    },
     params: {
       '-': 'getplaysongvkey',
       g_tk: 5381,
+      loginUin: uin,
       hostUin: 0,
       format: 'json',
       inCharset: 'utf8',
@@ -166,15 +165,16 @@ router.get('/song', async ctx => {
           },
         },
         comm: {
+          uin,
           format: 'json',
           ct: 19,
           cv: 0,
+          authst: qqmusic_key,
         },
       }),
     },
   })
-  console.log(555, data?.req_0?.data?.sip);
-  console.log(777, data?.req_0?.data?.midurlinfo?.[0]);
+  console.log(555, data?.req_0?.data);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
