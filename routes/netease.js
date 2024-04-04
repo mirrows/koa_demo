@@ -61,7 +61,7 @@ router.get('/newsong', async ctx => {
 
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
-  console.log(keyword, );
+  console.log(555, keyword);
   const cacheKey = `netease_search_${keyword}_${page}_${pagesize}_${type}`;
   const cacheData = curCache.get(cacheKey);
   if (cacheData) {
