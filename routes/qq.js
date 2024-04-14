@@ -142,7 +142,7 @@ router.get('/song', async ctx => {
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
   const guid = (Math.random() * 10000000).toFixed(0);
   let ip = ctx.request.ip;
-  // console.log(ip);
+  console.log(ip);
   if (ip.substr(0, 7) == '::ffff:') {
     ip = ip.substr(7)
   }
