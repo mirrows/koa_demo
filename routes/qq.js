@@ -151,9 +151,9 @@ router.get('/song', async ctx => {
     ...options,
     headers: {
       'Referer': 'https://u.y.qq.com',
+      'origin': 'https://y.qq.com',
       'X-Real-IP': ip,
       'X-Forwarded-For': ip,
-      'Sec-Fetch-Site': 'cross-site',
     },
     params: {
       '-': 'getplaysongvkey',
