@@ -25,7 +25,7 @@ const langMap = {
 
 const options = {
   headers: {
-    'Referer': 'https://y.qq.com',
+    'Referer': 'https://y.qq.com/portal/player.html',
   },
   xsrfCookieName: 'XSRF-TOKEN',
   withCredentials: true,
@@ -150,7 +150,7 @@ router.get('/song', async ctx => {
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
     headers: {
-      'Referer': 'https://u.y.qq.com',
+      'Referer': 'https://y.qq.com/portal/player.html',
       'origin': 'https://y.qq.com',
       'X-Real-IP': ip,
       'X-Forwarded-For': ip,
