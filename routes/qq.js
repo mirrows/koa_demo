@@ -26,8 +26,8 @@ const langMap = {
 const options = {
   headers: {
     'Referer': 'https://y.qq.com',
-    'X-Real-IP': '127.0.0.1',
-    'X-Forwarded-For': '127.0.0.1',
+    'X-Real-IP': '207.174.28.26',
+    'X-Forwarded-For': '207.174.28.26',
   },
   xsrfCookieName: 'XSRF-TOKEN',
   withCredentials: true,
@@ -147,7 +147,7 @@ router.get('/song', async ctx => {
     ip = ip.substr(7)
   }
   if (ip.match('::1')) { 
-    ip = '127.0.0.1'
+    ip = '207.174.28.26'
   }
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
