@@ -10,7 +10,7 @@ const req = axios.create({
 });
 
 req.interceptors.request.use(config => {
-  // console.log(config.url);
+  console.log(config.headers);
   return config;
 }, err => {
   console.log('req error:', err);

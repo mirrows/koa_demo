@@ -140,8 +140,12 @@ router.get('/song', async ctx => {
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
   const guid = (Math.random() * 10000000).toFixed(0);
   let ip = ctx.request.ip;
+  // console.log(ip);
   if (ip.substr(0, 7) == '::ffff:') {
     ip = ip.substr(7)
+  }
+  if (ip.match('::1')) { 
+    ip = '127.0.0.1'
   }
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
     ...options,
@@ -183,7 +187,7 @@ router.get('/song', async ctx => {
       }),
     },
   })
-  console.log(555, data?.req_0?.data);
+  // console.log(555, data?.req_0?.data);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
