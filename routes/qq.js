@@ -26,6 +26,8 @@ const langMap = {
 const options = {
   headers: {
     'Referer': 'https://y.qq.com',
+    'X-Real-IP': '127.0.0.1',
+    'X-Forwarded-For': '127.0.0.1',
   },
   xsrfCookieName: 'XSRF-TOKEN',
   withCredentials: true,
