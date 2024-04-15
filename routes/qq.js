@@ -25,7 +25,7 @@ const langMap = {
 
 const options = {
   headers: {
-    'Referer': 'https://y.qq.com',
+    'Referer': 'https://y.qq.com/portal/player.html',
   },
   xsrfCookieName: 'XSRF-TOKEN',
   withCredentials: true,
@@ -134,7 +134,7 @@ const quarityMap = {
 
 router.get('/song', async ctx => {
   const { id, mediaId = id, type = '128' } = ctx.request.query
-  let { uin, qqmusic_key } = { uin: '1787068206' };
+  let { uin, qqmusic_key } = { uin: '0' };
 
   const typeObj = quarityMap[type];
   const file = `${typeObj.s}${id}${mediaId}${typeObj.e}`;
@@ -147,44 +147,48 @@ router.get('/song', async ctx => {
   if (ip.match('::1')) { 
     ip = '127.0.0.1'
   }
-  const params = {
-    '-': 'getplaysongvkey',
-    g_tk: 5381,
-    loginUin: uin,
-    hostUin: 0,
-    format: 'json',
-    inCharset: 'utf8',
-    outCharset: 'utf-8',
-    notice: 0,
-    platform: 'yqq.json',
-    needNewCode: 0,
-    data: encodeURIComponent(JSON.stringify({
-      req_0: {
-        module: 'vkey.GetVkeyServer',
-        method: 'CgiGetVkey',
-        param: {
-          guid: '2796982635',
-          songmid: [id],
-          songtype: [0],
-          loginflag: 1,
-          platform: '20',
-          uin,
+  const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
+    ...options,
+    headers: {
+      'Referer': 'https://y.qq.com/portal/player.html',
+      'origin': 'https://y.qq.com',
+      'X-Real-IP': ip,
+      'X-Forwarded-For': ip,
+    },
+    params: {
+      '-': 'getplaysongvkey',
+      // g_tk: 5381,
+      loginUin: uin,
+      hostUin: 0,
+      format: 'json',
+      inCharset: 'utf8',
+      outCharset: 'utf-8-ice=0',  
+      platform: 'yqq.json',
+      needNewCode: 0,
+      data: JSON.stringify({
+        req_0: {
+          module: 'vkey.GetVkeyServer',
+          method: 'CgiGetVkey',
+          param: {
+            filename: [file],
+            guid: guid,
+            songmid: [id],
+            songtype: [0],
+            loginflag: 1,
+            platform: '20',
+          },
         },
-      },
-      comm: {
-        uin,
-        format: 'json',
-        ct: 24,
-        cv: 0,
-      },
-    })),
-  };
-  // const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
-  //   params,
-  // })
-  const { status, data } = await req.get(`https://u.y.qq.com/cgi-bin/musicu.fcg?-=&g_tk=5381&loginUin=1787068206&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%222796982635%22%2C%22songmid%22%3A%5B%22${id}%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%2C%22uin%22%3A%221787068206%22%7D%7D%2C%22comm%22%3A%7B%22uin%22%3A%221787068206%22%2C%22format%22%3A%22json%22%2C%22ct%22%3A24%2C%22cv%22%3A0%7D%7D`)
-  console.log(555, params);
-  console.log(888, data?.req_0?.data);
+        comm: {
+          uin,
+          format: 'json',
+          ct: 19,
+          cv: 0,
+          authst: qqmusic_key,
+        },
+      }),
+    },
+  })
+  // console.log(555, data?.req_0?.data);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
