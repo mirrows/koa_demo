@@ -148,11 +148,6 @@ router.get('/song', async ctx => {
     ip = '127.0.0.1'
   }
   const { status, data } = await req.get('https://u.y.qq.com/cgi-bin/musicu.fcg', {
-    ...options,
-    headers: {
-      'Referer': 'https://y.qq.com/portal/player.html',
-      'origin': 'https://y.qq.com',
-    },
     params: {
       '-': 'getplaysongvkey',
       g_tk: 5381,
