@@ -184,7 +184,7 @@ router.get('/song', async ctx => {
   // })
   const { status, data } = await req.get(`https://u.y.qq.com/cgi-bin/musicu.fcg?-=&g_tk=5381&loginUin=1787068206&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22req_0%22%3A%7B%22module%22%3A%22vkey.GetVkeyServer%22%2C%22method%22%3A%22CgiGetVkey%22%2C%22param%22%3A%7B%22guid%22%3A%222796982635%22%2C%22songmid%22%3A%5B%22${id}%22%5D%2C%22songtype%22%3A%5B0%5D%2C%22loginflag%22%3A1%2C%22platform%22%3A%2220%22%2C%22uin%22%3A%221787068206%22%7D%7D%2C%22comm%22%3A%7B%22uin%22%3A%221787068206%22%2C%22format%22%3A%22json%22%2C%22ct%22%3A24%2C%22cv%22%3A0%7D%7D`)
   console.log(555, params);
-  console.log(888, data);
+  console.log(888, data?.req_0?.data);
   const url = (data?.req_0?.data?.sip?.find(i => !i.startsWith('http://ws')) || data?.req_0?.data.sip?.[0] || '') + (data?.req_0?.data?.midurlinfo?.[0]?.purl || '')
   if (status === 200) {
     ctx.body = {
