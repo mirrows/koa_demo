@@ -11,7 +11,7 @@ router.post('/shadowsock', async ctx => {
     await sshClient.exec('firewall-cmd --reload');
   }
   if (method) {
-    await sshClient.exec(`sed -i '8s/.*/    "method":"${method}",/g' /etc/shadowsocks.json`);
+    await sshClient.exec(`sed -i '8s/.*/    "method":"${method}"/g' /etc/shadowsocks.json`);
   }
   await sshClient.exec('cat /etc/shadowsocks.json');
   await sshClient.exec('ssserver -c /etc/shadowsocks.json -d restart');
