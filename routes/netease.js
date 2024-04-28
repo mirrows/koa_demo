@@ -81,6 +81,20 @@ router.get('/newsong', async ctx => {
   ctx.body = body;
 })
 
+router.get('/cookie', () => {
+  ctx.body = getCookie();
+})
+
+router.get('/encode', (ctx) => {
+  const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
+  ctx.body = new URLSearchParams(encrypt.weapi({
+    s: keyword,
+    type: typeMap[type], // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
+    limit: pagesize,
+    offset: (page - 1) * pagesize,
+  })).toString();
+})
+
 router.get('/search', async ctx => {
   const { keyword, page = 1, pagesize = 30, type = 'song' } = ctx.request.query
   const cacheKey = `netease_search_${keyword}_${page}_${pagesize}_${type}`;
