@@ -81,7 +81,7 @@ router.get('/newsong', async ctx => {
   ctx.body = body;
 })
 
-router.get('/cookie', () => {
+router.get('/cookie', (ctx) => {
   ctx.body = getCookie();
 })
 
