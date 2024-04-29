@@ -14,7 +14,12 @@ router.get('/newsong', async ctx => {
   if (cacheData) {
     return ctx.body = cacheData;
   }
-  const data = await Promise.allSettled([...Array(4)].map((_, i) => req.get(`https://m.kugou.com/newsong/index/${i+1}?json=true`, { params: { json: true } })))
+  const data = await Promise.allSettled([...Array(4)].map((_, i) => req.get(`https://m.kugou.com/newsong/index/${i+1}?json=true`, {
+    params: { json: true },
+    headers:  {
+      'Referer': 'https://m.kugou.com/',
+    },
+  })))
   const list = data.filter(songs => songs.status === 'fulfilled').map(songs => songs.value.data?.newSongList?.filter(e => e.trans_param?.musicpack_advance !== 1) || [])
   // const { status, data: { newSongList } } = await req.get(`https://m.kugou.com/newsong/index/${n}?json=true`, { params: { json: true } })
   const body = {

@@ -44,7 +44,7 @@ router.get('/newsong', async ctx => {
     const body = {
       code: 0,
       // data,
-      data: data?.results?.filter(e => e.songData?.listenUrl) || []
+      data: data?.results?.filter(e => e.songData?.listenUrl).map(e => e.songData) || []
     }
     curCache.set(cacheKey, body, 60 * 12);
     ctx.body = body;
