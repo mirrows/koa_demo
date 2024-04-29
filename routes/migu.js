@@ -15,6 +15,7 @@ const typeMap = {
 const options = {
   headers: {
     referer: 'http://m.music.migu.cn/v3',
+    'Content-Type': 'application/json',
   },
   xsrfCookieName: 'XSRF-TOKEN',
   withCredentials: true,
