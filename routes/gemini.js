@@ -44,7 +44,7 @@ router.post('/text', async (ctx) => {
     console.log('连接关闭')
     // ctx.body=""
   });
-  // const chat = model.startChat({})
+  const chat = model.startChat({})
   // displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
   ctx.status = 200;
