@@ -28,14 +28,14 @@ async function displayChatTokenCount(model, chat, msg) {
   await displayTokenCount(model, { contents: [...history, msgContent] });
 }
 
-router.get('/text', async (ctx) => {
+router.post('/text', async (ctx) => {
   ctx.set({
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
   console.log('请求进入');
-  const { msg } = ctx.request.query
+  const { msg } = ctx.request.body
   const chat = model.startChat({})
   displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
