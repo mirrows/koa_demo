@@ -43,7 +43,7 @@ router.get('/text', async (ctx) => {
 
   // 当客户端关闭连接时清除定时器
   ctx.req.on('close', () => {
-    clearInterval(interval);
+    console.log('连接关闭')
   });
 })
 
