@@ -40,10 +40,10 @@ router.post('/text', async (ctx) => {
   const chat = model.startChat({})
   displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
-  // const stream = new PassThrough();
+  const stream = new PassThrough();
   ctx.status = 200;
-  ctx.body = result1.stream;
-  // await streamToStdout(stream, result1.stream);
+  ctx.body = stream;
+  await streamToStdout(stream, result1.stream);
   // 当客户端关闭连接时清除定时器
   ctx.req.on('close', () => {
     console.log('连接关闭')
