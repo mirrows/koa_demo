@@ -15,7 +15,7 @@ app.use(async (ctx, next) => {
   } else {
     // try {
       await next();   // 执行后代的代码
-      if (!ctx.body) {  // 没有资源
+      if (!ctx.body && ctx.Connection !== 'keep-alive') {  // 没有资源
         ctx.status = 404;
         ctx.body = { code: 404, msg: 'page has loss' };
       }
