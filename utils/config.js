@@ -14,4 +14,5 @@ module.exports = {
   },
   dbName: process.env.DBNAME,
   mongoUri: process.env.MONGO_URI,
+  gemini: process.env.GEMINI_API_KEY,
 }
