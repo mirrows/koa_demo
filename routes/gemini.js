@@ -98,7 +98,14 @@ router.post('/answer', async (ctx) => {
     data: questions[id] || [],
     history,
   }
-  
+})
+
+router.post('/history', async (ctx) => {
+  const history = await longChat.getHistory();
+  ctx.body = {
+    code: 0,
+    history,
+  }
 })
 
 
