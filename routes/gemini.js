@@ -1,9 +1,12 @@
 const router = require('koa-router')(); //引入并实例化
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { gemini } = require('../utils/config');
+const md5 = require('md5');
 
 const genAI = new GoogleGenerativeAI(gemini)
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const longChat = model.startChat({})
+const questions = {}
 
 async function streamToStdout(ctx, content) {
   console.log("Streaming...\n");
@@ -15,6 +18,16 @@ async function streamToStdout(ctx, content) {
     ctx.res.write(`data: ${chunkText}\n\n`);
   }
   ctx.res.end()
+}
+
+async function streamToStdoutTimeout(key, content) {
+  for await (const chunk of content) {
+    // Get first candidate's current text chunk
+    const chunkText = chunk.text();
+    console.log(chunkText)
+    // Print to console without adding line breaks
+    questions[key].answer.push(chunkText)
+  }
 }
 
 async function displayTokenCount(model, request) {
@@ -48,8 +61,32 @@ router.get('/text', async (ctx) => {
   const chat = model.startChat({})
   // displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
-  
   await streamToStdout(ctx, result1.stream);
+  
+})
+
+router.post('/question', async (ctx) => {
+  const { msg } = ctx.request.body
+  // displayChatTokenCount(model, chat, msg);
+  const result1 = await longChat.sendMessageStream(msg);
+  const key = md5(msg)
+  
+  ctx.body = {
+    code: 0,
+    id: key,
+  }
+  await streamToStdoutTimeout(key, result1.stream);
+  
+})
+
+router.post('/answer', async (ctx) => {
+  const { id } = ctx.request.body
+  const history = await longChat.getHistory();
+  ctx.body = {
+    code: 0,
+    data: questions[id] || [],
+    history,
+  }
   
 })
 
