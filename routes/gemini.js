@@ -12,10 +12,8 @@ async function streamToStdout(ctx, content) {
     // Get first candidate's current text chunk
     const chunkText = chunk.text();
     // Print to console without adding line breaks
-    ctx.res.write(`data: ${chunkText}\n\n`);
+    ctx.res.write(`data: ${chunkText}\n`);
   }
-  // Print blank line
-  // console.log("\n");
 }
 
 async function displayTokenCount(model, request) {
