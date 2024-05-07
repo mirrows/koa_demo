@@ -51,7 +51,7 @@ router.post('/text', async (ctx) => {
   // displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
   
-  await streamToStdout(stream, result1.stream);
+  await streamToStdout(ctx, result1.stream);
   
 })
 
