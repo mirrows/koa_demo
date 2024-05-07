@@ -6,13 +6,13 @@ const { PassThrough } = require("stream");
 const genAI = new GoogleGenerativeAI(gemini)
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-async function streamToStdout(stream, content) {
+async function streamToStdout(ctx, content) {
   console.log("Streaming...\n");
   for await (const chunk of content) {
     // Get first candidate's current text chunk
     const chunkText = chunk.text();
     // Print to console without adding line breaks
-    stream.write(`data: ${chunkText}`);
+    ctx.res.write(`data: ${chunkText}\n\n`);
   }
   // Print blank line
   // console.log("\n");
@@ -40,17 +40,18 @@ router.post('/text', async (ctx) => {
     'Connection': 'keep-alive'
   });
   console.log('请求进入');
+  // 当客户端关闭连接时清除定时器
   ctx.req.on('close', () => {
     console.log('连接关闭')
+    ctx.status = 200;
+    ctx.body = '';
     // ctx.body=""
   });
   const chat = model.startChat({})
   // displayChatTokenCount(model, chat, msg);
   const result1 = await chat.sendMessageStream(msg);
-  ctx.status = 200;
-  ctx.body = result1.stream;
-  // await streamToStdout(stream, result1.stream);
-  // 当客户端关闭连接时清除定时器
+  
+  await streamToStdout(stream, result1.stream);
   
 })
 
