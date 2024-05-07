@@ -28,8 +28,8 @@ async function displayChatTokenCount(model, chat, msg) {
   await displayTokenCount(model, { contents: [...history, msgContent] });
 }
 
-router.post('/text', async (ctx) => {
-  const { msg } = ctx.request.body
+router.get('/text', async (ctx) => {
+  const { msg } = ctx.request.query
   ctx.request.socket.setTimeout(0);
   ctx.req.socket.setNoDelay(true);
   ctx.req.socket.setKeepAlive(true);
