@@ -32,6 +32,7 @@ router.post('/text', async (ctx) => {
   ctx.request.socket.setTimeout(0);
   ctx.req.socket.setNoDelay(true);
   ctx.req.socket.setKeepAlive(true);
+  ctx.status = 200;
   ctx.set({
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
