@@ -1,7 +1,6 @@
 const router = require('koa-router')(); //引入并实例化
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { gemini } = require('../utils/config');
-const { PassThrough } = require("stream");
 
 const genAI = new GoogleGenerativeAI(gemini)
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -13,7 +12,7 @@ async function streamToStdout(ctx, content) {
     const chunkText = chunk.text();
     console.log(chunkText)
     // Print to console without adding line breaks
-    ctx.res.write(`data: ${chunkText}\n`);
+    ctx.res.write(`data: ${chunkText}\n\n`);
   }
 }
 
@@ -43,8 +42,6 @@ router.get('/text', async (ctx) => {
   // 当客户端关闭连接时清除定时器
   ctx.req.on('close', () => {
     console.log('连接关闭')
-    ctx.status = 200;
-    ctx.body = '';
     // ctx.body=""
   });
   const chat = model.startChat({})
