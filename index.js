@@ -15,8 +15,6 @@ app.use(async (ctx, next) => {
   } else {
     // try {
       await next();   // 执行后代的代码
-      console.log(555, ctx.response.get('connection'))
-      console.log(ctx)
       if (!ctx.body && ctx.response.get('connection') !== 'keep-alive') {  // 没有资源
         ctx.status = 404;
         ctx.body = { code: 404, msg: 'page has loss' };

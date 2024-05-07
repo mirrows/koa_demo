@@ -11,6 +11,7 @@ async function streamToStdout(ctx, content) {
   for await (const chunk of content) {
     // Get first candidate's current text chunk
     const chunkText = chunk.text();
+    console.log(chunkText)
     // Print to console without adding line breaks
     ctx.res.write(`data: ${chunkText}\n`);
   }
