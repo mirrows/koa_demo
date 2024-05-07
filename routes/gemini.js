@@ -70,7 +70,7 @@ router.post('/question', async (ctx) => {
   // displayChatTokenCount(model, chat, msg);
   const result1 = await longChat.sendMessageStream(msg);
   const key = md5(msg)
-  
+  console.log(3433)
   ctx.body = {
     code: 0,
     id: key,
