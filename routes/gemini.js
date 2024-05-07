@@ -14,6 +14,7 @@ async function streamToStdout(ctx, content) {
     // Print to console without adding line breaks
     ctx.res.write(`data: ${chunkText}\n\n`);
   }
+  ctx.res.end()
 }
 
 async function displayTokenCount(model, request) {
