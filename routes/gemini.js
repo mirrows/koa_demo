@@ -68,19 +68,30 @@ router.get('/text', async (ctx) => {
 router.post('/question', async (ctx) => {
   const { msg } = ctx.request.body
   // displayChatTokenCount(model, chat, msg);
-  const result1 = await longChat.sendMessageStream(msg);
   const key = md5(msg)
-  console.log(3433)
+  if(!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+    questions[key] = {
+      id: key,
+      question: msg,
+      answer: [],
+      timestamp: Date.now(),
+    }
+    const result1 = await longChat.sendMessageStream(msg);
+    streamToStdoutTimeout(key, result1.stream);
+  }
   ctx.body = {
     code: 0,
     id: key,
   }
-  await streamToStdoutTimeout(key, result1.stream);
-  
 })
 
 router.post('/answer', async (ctx) => {
   const { id } = ctx.request.body
+  Object.keys(questions).forEach(key => {
+    if (Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+      delete questions[key]
+    }
+  })
   const history = await longChat.getHistory();
   ctx.body = {
     code: 0,
