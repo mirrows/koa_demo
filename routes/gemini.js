@@ -8,6 +8,10 @@ const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 const longChat = model.startChat({})
 const questions = {}
 
+const aiMap = {
+
+}
+
 async function streamToStdout(ctx, content) {
   console.log("Streaming...\n");
   for await (const chunk of content) {
@@ -65,7 +69,7 @@ router.get('/text', async (ctx) => {
   
 })
 
-router.post('/question', async (ctx) => {
+router.post('/question_old', async (ctx) => {
   const { msg } = ctx.request.body
   // displayChatTokenCount(model, chat, msg);
   const key = md5(msg)
@@ -85,7 +89,7 @@ router.post('/question', async (ctx) => {
   }
 })
 
-router.post('/answer', async (ctx) => {
+router.post('/answer_old', async (ctx) => {
   const { id } = ctx.request.body
   Object.keys(questions).forEach(key => {
     if (Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
@@ -100,8 +104,90 @@ router.post('/answer', async (ctx) => {
   }
 })
 
-router.post('/history', async (ctx) => {
+router.post('/history_old', async (ctx) => {
   const history = await longChat.getHistory();
+  ctx.body = {
+    code: 0,
+    history,
+  }
+})
+
+
+
+
+router.post('/question', async (ctx) => {
+  const { token } = ctx.headers;
+  const { msg } = ctx.request.body
+  // displayChatTokenCount(model, chat, msg);
+  if (!aiMap[token]) {
+    return ctx.body = {
+      code: 400,
+      msg: '请初始化gemini'
+    }
+  }
+  const key = md5(msg)
+  if(!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+    questions[key] = {
+      id: key,
+      question: msg,
+      answer: [],
+      timestamp: Date.now(),
+    }
+    const result1 = await aiMap[token].chat.sendMessageStream(msg);
+    streamToStdoutTimeout(key, result1.stream);
+  }
+  ctx.body = {
+    code: 0,
+    id: key,
+  }
+})
+
+router.post('/answer', async (ctx) => {
+  const { token } = ctx.headers;
+  const { id } = ctx.request.body;
+  Object.keys(questions).forEach(key => {
+    if (Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+      delete questions[key]
+    }
+  })
+  if (!aiMap[token]) {
+    return ctx.body = {
+      code: 400,
+      msg: '请初始化gemini'
+    }
+  }
+  const history = await aiMap[token].chat.getHistory();
+  ctx.body = {
+    code: 0,
+    data: questions[id] || [],
+    history,
+  }
+})
+
+router.post('/history', async (ctx) => {
+  const { token } = ctx.headers;
+  if (!aiMap[token]) {
+    return ctx.body = {
+      code: 400,
+      msg: '请初始化gemini'
+    }
+  }
+  const history = await aiMap[token].chat.getHistory();
+  ctx.body = {
+    code: 0,
+    history,
+  }
+})
+
+router.post('/init', async (ctx) => {
+  const { token } = ctx.headers;
+  if (!aiMap[token]) {
+    aiMap[token] = {}
+    aiMap[token].genAI = new GoogleGenerativeAI(token)
+    aiMap[token].model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    aiMap[token].chat = model.startChat({})
+  }
+  const history = await aiMap[token].chat.getHistory();
   ctx.body = {
     code: 0,
     history,
