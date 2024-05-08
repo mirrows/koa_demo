@@ -30,7 +30,7 @@ async function streamToStdoutTimeout(key, content) {
     const chunkText = chunk.text();
     console.log(chunkText)
     // Print to console without adding line breaks
-    questions[key].answer.push(chunkText)
+    questions[key].answer.push({ text: chunkText })
   }
 }
 
