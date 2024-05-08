@@ -194,6 +194,7 @@ router.post('/init', async (ctx) => {
       })
       console.log(data)
     } catch(err) {
+      delete aiMap[token]
       return ctx.body = err
     }
     
