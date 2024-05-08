@@ -187,7 +187,7 @@ router.post('/init', async (ctx) => {
     aiMap[token].model = genAI.getGenerativeModel({ model: "gemini-pro" });
     aiMap[token].chat = model.startChat({})
     const data = await model.countTokens({
-      contents: ['good morning'],
+      contents: { role: "user", parts: [{ text: 'good morning' }] },
     })
     console.log(data)
   }
