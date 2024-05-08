@@ -187,10 +187,9 @@ router.post('/init', async (ctx) => {
     aiMap[token].model = genAI.getGenerativeModel({ model: "gemini-pro" });
     aiMap[token].chat = model.startChat({})
     try {
-      const data = await model.countTokens({
+      await model.countTokens({
         contents: [{ role: "user", parts: [{ text: 'hello' }] }],
       })
-      console.log(data)
     } catch(err) {
       delete aiMap[token]
       return ctx.body = {
