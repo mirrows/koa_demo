@@ -156,11 +156,11 @@ router.post('/answer', async (ctx) => {
       msg: '请初始化gemini'
     }
   }
-  const history = await aiMap[token].chat.getHistory();
+  // const history = await aiMap[token].chat.getHistory();
   ctx.body = {
     code: 0,
     data: questions[id] || [],
-    history,
+    // history,
   }
 })
 
