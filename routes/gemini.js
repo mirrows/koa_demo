@@ -194,7 +194,6 @@ router.post('/init', async (ctx) => {
         msg: err
       }
     }
-    console.log(data)
   }
   const history = await aiMap[token].chat.getHistory();
   ctx.body = {
