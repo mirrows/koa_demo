@@ -186,12 +186,12 @@ router.post('/init', async (ctx) => {
     aiMap[token].genAI = new GoogleGenerativeAI(token)
     aiMap[token].model = aiMap[token].genAI.getGenerativeModel({ model: "gemini-pro" });
     aiMap[token].chat = aiMap[token].model.startChat({})
-    console.log(token)
     try {
       await aiMap[token].model.countTokens({
         contents: [{ role: "user", parts: [{ text: 'hello' }] }],
       })
     } catch(err) {
+      console.log(token)
       delete aiMap[token]
       return ctx.body = {
         code: 400,
