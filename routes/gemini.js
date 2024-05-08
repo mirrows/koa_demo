@@ -186,9 +186,14 @@ router.post('/init', async (ctx) => {
     aiMap[token].genAI = new GoogleGenerativeAI(token)
     aiMap[token].model = genAI.getGenerativeModel({ model: "gemini-pro" });
     aiMap[token].chat = model.startChat({})
-    const data = await model.countTokens({
-      contents: [{ role: "user", parts: [{ text: 'good morning' }] }],
-    })
+    try {
+      await aiMap[token].chat.sendMessageStream('hello')
+    } catch(err) {
+      return ctx.body = {
+        code: 400,
+        msg: err
+      }
+    }
     console.log(data)
   }
   const history = await aiMap[token].chat.getHistory();
