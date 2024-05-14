@@ -8,7 +8,7 @@
   ],
   "crons": [
     {
-      "path": "/api/cron",
+      "path": "/cron/bing",
       "schedule": "31 14 * * *"
     },
     {
