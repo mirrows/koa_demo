@@ -3,7 +3,7 @@ import { githubToken } from "../utils/config"
 import { imgUrlToBase64 } from "../utils/imgTool"
 import { req } from "../utils/req"
 
-export default async function handler(request, response) {
+export default async function bing(request, response) {
   // const { name } = request.query
   // response.status(200).send(`Hello ${name}!`)
   const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
