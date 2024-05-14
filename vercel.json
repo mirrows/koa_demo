@@ -9,7 +9,7 @@
   "crons": [
     {
       "path": "/cron/bing",
-      "schedule": "0 1 * * *"
+      "schedule": "2 16 * * *"
     }
   ],
   "routes": [
