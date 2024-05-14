@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const { req } = require('./req');
 
-function imgUrlToBase64(url, cb=async () => { }) {
+function imgUrlToBase64(url, cb=async () => {}) {
   return new Promise(function (resolve) {
     req.get(url, { responseType: 'arraybuffer' })
       .then(async res => {
