@@ -8,12 +8,8 @@
   ],
   "crons": [
     {
-      "path": "/cron/bing",
-      "schedule": "31 14 * * *"
-    },
-    {
-      "path": "/api/time",
-      "schedule": "0 5 * * *"
+      "path": "/api/cron",
+      "schedule": "45 15 * * *"
     }
   ],
   "routes": [
