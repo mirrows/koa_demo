@@ -20,6 +20,7 @@ router.get('/bing', async ctx => {
       }
     }
     todayBingUrl = `https://bing.com${data.images[0].url}`
+    bingTime = `${enddate.slice(0, 4)}_${enddate.slice(4, 6)}_${enddate.slice(6)}`
     // const binPicData = {
     //   ...data.images[0],
     //   url: `https://bing.com${data.images[0].url}`
@@ -30,10 +31,10 @@ router.get('/bing', async ctx => {
       msg: '请设置图片链接: url'
     }
   }
-  
+
   const base64 = await imgUrlToBase64(todayBingUrl)
   const mode = 'photo'
-  const realPath = `normal/${Format(time ? new Date(time) : new Date(), 'YYYY_MM_DD')}/${name}`
+  const realPath = `normal/${bingTime ? bingTime : Format(time ? new Date(time) : new Date(), 'YYYY_MM_DD')}/${name}`
   // https://wsrv.nl/?url=raw.githubusercontent.com/mirrows/photo/main/normal/2024_05_09/pic1715235436149104.png&w=300&fit=cover&n=-1&q=80
   const res = await req.put(`https://api.github.com/repos/${gUser}/${mode}/contents/${realPath}`, {
     content: base64.data,
