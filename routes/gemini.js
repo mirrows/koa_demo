@@ -12,6 +12,19 @@ const aiMap = {
 
 }
 
+let lastTime = 0
+
+let times = 60
+
+function countTimes() {
+  const now = Date.now()
+  if (now - lastTime > 1000 * 60 * 60) {
+    lastTime = now
+    times = 60
+  }
+  times -= 1
+}
+
 async function streamToStdout(ctx, content) {
   console.log("Streaming...\n");
   for await (const chunk of content) {
@@ -64,21 +77,35 @@ router.get('/text', async (ctx) => {
   });
   const chat = model.startChat({})
   // displayChatTokenCount(model, chat, msg);
+  countTimes()
+  if (times < 0) {
+    return ctx.body = {
+      code: 400,
+      msg: '次数已用完，请等一小时后再使用'
+    }
+  }
   const result1 = await chat.sendMessageStream(msg);
   await streamToStdout(ctx, result1.stream);
-  
+
 })
 
 router.post('/question_old', async (ctx) => {
   const { msg } = ctx.request.body
   // displayChatTokenCount(model, chat, msg);
   const key = md5(msg)
-  if(!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+  if (!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
     questions[key] = {
       id: key,
       question: msg,
       answer: [],
       timestamp: Date.now(),
+    }
+    countTimes()
+    if (times < 0) {
+      return ctx.body = {
+        code: 400,
+        msg: '次数已用完，请等一小时后再使用'
+      }
     }
     const result1 = await longChat.sendMessageStream(msg);
     streamToStdoutTimeout(key, result1.stream);
@@ -86,6 +113,7 @@ router.post('/question_old', async (ctx) => {
   ctx.body = {
     code: 0,
     id: key,
+    times,
   }
 })
 
@@ -101,6 +129,7 @@ router.post('/answer_old', async (ctx) => {
     code: 0,
     data: questions[id] || [],
     history,
+    times,
   }
 })
 
@@ -109,6 +138,7 @@ router.post('/history_old', async (ctx) => {
   ctx.body = {
     code: 0,
     history,
+    times,
   }
 })
 
@@ -126,12 +156,19 @@ router.post('/question', async (ctx) => {
     }
   }
   const key = md5(msg)
-  if(!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
+  if (!questions[key] || Date.now() - questions[key].timestamp > 30 * 60 * 1000) {
     questions[key] = {
       id: key,
       question: msg,
       answer: [],
       timestamp: Date.now(),
+    }
+    countTimes()
+    if (times < 0) {
+      return ctx.body = {
+        code: 400,
+        msg: '次数已用完，请等一小时后再使用'
+      }
     }
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
     streamToStdoutTimeout(key, result1.stream);
@@ -139,6 +176,7 @@ router.post('/question', async (ctx) => {
   ctx.body = {
     code: 0,
     id: key,
+    times,
   }
 })
 
@@ -160,6 +198,7 @@ router.post('/answer', async (ctx) => {
   ctx.body = {
     code: 0,
     data: questions[id] || [],
+    times,
     // history,
   }
 })
@@ -176,6 +215,7 @@ router.post('/history', async (ctx) => {
   ctx.body = {
     code: 0,
     history,
+    times,
   }
 })
 
@@ -190,7 +230,7 @@ router.post('/init', async (ctx) => {
       await aiMap[token].model.countTokens({
         contents: [{ role: "user", parts: [{ text: 'hello' }] }],
       })
-    } catch(err) {
+    } catch (err) {
       console.log(token)
       delete aiMap[token]
       return ctx.body = {
@@ -198,12 +238,46 @@ router.post('/init', async (ctx) => {
         msg: err,
       }
     }
-    
+
   }
   const history = await aiMap[token].chat.getHistory();
   ctx.body = {
     code: 0,
     history,
+    times,
+  }
+})
+
+
+// 下面是自身生成chat对象
+
+router.post('/init_global', async (ctx) => {
+  const { token, authorization } = ctx.headers;
+  const { history: oldData } = ctx.request.body;
+  if (!aiMap[token]) {
+    aiMap[token] = {}
+    aiMap[token].genAI = new GoogleGenerativeAI(authorization || gemini)
+    aiMap[token].model = aiMap[token].genAI.getGenerativeModel({ model: "gemini-pro" });
+    aiMap[token].chat = aiMap[token].model.startChat({
+      history: oldData ? oldData : [],
+    })
+    try {
+      await aiMap[token].model.countTokens({
+        contents: [{ role: "user", parts: [{ text: 'hello' }] }],
+      })
+    } catch (err) {
+      delete aiMap[token]
+      return ctx.body = {
+        code: 400,
+        msg: err,
+      }
+    }
+  }
+  const history = await aiMap[token].chat.getHistory();
+  ctx.body = {
+    code: 0,
+    history,
+    times,
   }
 })
 
