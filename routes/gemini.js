@@ -251,30 +251,40 @@ router.post('/init', async (ctx) => {
 
 // 下面是自身生成chat对象
 
+function clearCache() {
+  Object.keys(aiMap).forEach((ai) => {
+    if (Date.now - aiMap[ai].data > 1000 * 60 * 60 * 24) {
+      delete aiMap[ai]
+    }
+  })
+}
+
 router.post('/init_global', async (ctx) => {
   const { token, authorization } = ctx.headers;
   const { history = [] } = ctx.request.body || {};
-  if (!aiMap[token]) {
-    aiMap[token] = {}
-    console.log(authorization || gemini)
-    aiMap[token].genAI = new GoogleGenerativeAI(authorization || gemini)
-    aiMap[token].model = aiMap[token].genAI.getGenerativeModel({ model: "gemini-pro" });
-    aiMap[token].chat = aiMap[token].model.startChat({
-      history,
+  clearCache()
+  // if (!aiMap[token]) {
+  aiMap[token] = {}
+  console.log(authorization || gemini)
+  aiMap[token].genAI = new GoogleGenerativeAI(authorization || gemini)
+  aiMap[token].model = aiMap[token].genAI.getGenerativeModel({ model: "gemini-pro" });
+  aiMap[token].chat = aiMap[token].model.startChat({
+    history,
+  })
+  aiMap[token].date = Date.now()
+  try {
+    await aiMap[token].model.countTokens({
+      contents: [{ role: "user", parts: [{ text: 'hello' }] }],
     })
-    try {
-      await aiMap[token].model.countTokens({
-        contents: [{ role: "user", parts: [{ text: 'hello' }] }],
-      })
-    } catch (err) {
-      console.log(err)
-      delete aiMap[token]
-      return ctx.body = {
-        code: 400,
-        msg: err,
-      }
+  } catch (err) {
+    console.log(err)
+    delete aiMap[token]
+    return ctx.body = {
+      code: 400,
+      msg: err,
     }
   }
+  // }
   const oldData = await aiMap[token].chat.getHistory();
   ctx.body = {
     code: 0,
