@@ -267,6 +267,7 @@ router.post('/init_global', async (ctx) => {
         contents: [{ role: "user", parts: [{ text: 'hello' }] }],
       })
     } catch (err) {
+      console.log(err)
       delete aiMap[token]
       return ctx.body = {
         code: 400,
