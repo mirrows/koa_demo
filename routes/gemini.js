@@ -253,13 +253,13 @@ router.post('/init', async (ctx) => {
 
 router.post('/init_global', async (ctx) => {
   const { token, authorization } = ctx.headers;
-  const { history } = ctx.request.body;
+  const { history = [] } = ctx.request.body || {};
   if (!aiMap[token]) {
     aiMap[token] = {}
     aiMap[token].genAI = new GoogleGenerativeAI(authorization || gemini)
     aiMap[token].model = aiMap[token].genAI.getGenerativeModel({ model: "gemini-pro" });
     aiMap[token].chat = aiMap[token].model.startChat({
-      history: history ? history : [],
+      history,
     })
     try {
       await aiMap[token].model.countTokens({
