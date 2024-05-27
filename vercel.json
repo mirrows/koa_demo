@@ -6,12 +6,6 @@
       "use": "@vercel/node"
     }
   ],
-  "crons": [
-    {
-      "path": "/cron/bing",
-      "schedule": "0 0 * * *"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",

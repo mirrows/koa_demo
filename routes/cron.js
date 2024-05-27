@@ -2,6 +2,7 @@ const { req } = require('../utils/req');
 const { gUser, githubToken } = require("../utils/config");
 const { Format } = require('../utils/common');
 const { imgUrlToBase64 } = require('../utils/imgTool');
+const cron = require('node-cron')
 
 const router = require('koa-router')(); //引入并实例化
 
@@ -64,6 +65,12 @@ router.get('/bing', async ctx => {
     }
   }
 })
+
+const task = cron.schedule('5 * * * * *', () => {
+  console.log('每分钟在第 5 秒运行任务')
+})
+
+task.start()
 
 
 module.exports = router;
