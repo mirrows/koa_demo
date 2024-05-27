@@ -66,11 +66,53 @@ router.get('/bing', async ctx => {
   }
 })
 
-const task = cron.schedule('5 * * * * *', () => {
-  console.log('每分钟在第 5 秒运行任务')
+const task = cron.schedule('0 50 17 * * *', () => {
+  queryBingImage()
+}, {
+  timezone: 'Asia/Shanghai'
 })
 
 task.start()
+
+async function queryBingImage() {
+  console.log('请求bing图片啦')
+  const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
+    params: { format: 'js', n: 1 },
+  })
+  if (status !== 200) {
+    console.log('图片请求失败')
+    return
+    // ctx.status = 500
+    // return ctx.body = {
+    //   code: 500,
+    //   msg: '图片请求失败'
+    // }
+  }
+  const { addStatus, addData } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1/comments`, {
+    body: JSON.stringify(data?.images[0] || []),
+  }, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: githubToken,
+    },
+  }).catch(err => {
+    console.log(err)
+  })
+  if (addStatus !== 200) {
+    console.log('图片添加失败')
+    return
+    // ctx.status = 500
+    // return ctx.body = {
+    //   code: 500,
+    //   msg: '图片添加失败'
+    // }
+  }
+  console.log('图片添加成功')
+  // ctx.body = {
+  //   code: 0,
+  //   data: addData,
+  // }
+}
 
 
 module.exports = router;
