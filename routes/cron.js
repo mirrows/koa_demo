@@ -66,7 +66,7 @@ router.get('/bing', async ctx => {
   }
 })
 
-const task = cron.schedule('0 50 17 * * *', () => {
+const task = cron.schedule('0 0 0 * * *', () => {
   queryBingImage()
 }, {
   timezone: 'Asia/Shanghai'
