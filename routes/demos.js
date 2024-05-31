@@ -42,10 +42,6 @@ router.put('/uploadBase64', async (ctx) => {
       code: 0,
       data: {
         ...f,
-        cdn_url: f.download_url?.replace(
-          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
-          cdnMap[mode]
-        ),
       },
     }
   } else {
@@ -74,7 +70,7 @@ router.put('/uploadUrl', async (ctx) => {
     const img = sharp(buffer)
     const format = (meta?.format || path.split('.')[1] || 'jpeg').replace('jpg', 'jpeg')
     const buf = await (['gif', 'raw', 'tile', 'webp'].includes(format)
-    ? img.toBuffer()
+      ? img.toBuffer()
       : img[format]({ quality: path.match('mini') ? 30 : 80 }).toBuffer());
     return buf
   })
@@ -97,10 +93,6 @@ router.put('/uploadUrl', async (ctx) => {
       code: 0,
       data: {
         ...f,
-        cdn_url: f.download_url?.replace(
-          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
-          cdnMap[mode]
-        ),
       },
     }
   } else {
@@ -128,20 +120,18 @@ router.post('/queryPicList', async (ctx) => {
   })
   ctx.body = {
     code: 0,
-    ...(error ? {error, data: []} : {data: (Array.isArray(res?.data)?res?.data : []).reverse().map(f => ({
-      ...f,
-      name: f.name.replaceAll('_', '-'),
-      cdn_url: f.download_url?.replace(
-        `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
-        cdnMap[mode]
-      ),
-      ...(path.match('mini') ? {
-        normal_url: f.download_url?.replace(
-          `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
-          cdnMap[mode]
-        ).replace('mini', 'normal')
-      } : {})
-    }))}),
+    ...(error ? { error, data: [] } : {
+      data: (Array.isArray(res?.data) ? res?.data : []).reverse().map(f => ({
+        ...f,
+        name: f.name.replaceAll('_', '-'),
+        ...(path.match('mini') ? {
+          normal_url: f.download_url?.replace(
+            `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
+            cdnMap[mode]
+          ).replace('mini', 'normal')
+        } : {})
+      }))
+    }),
   }
 })
 
@@ -166,10 +156,6 @@ router.post('/queryPic', async (ctx) => {
       } : {
         data: ({
           ...(res.data || {}),
-          cdn_url: res.data.download_url?.replace(
-            `https://raw.githubusercontent.com/${gUser}/${mode}/main`,
-            cdnMap[mode]
-          ),
         })
       }),
   }
