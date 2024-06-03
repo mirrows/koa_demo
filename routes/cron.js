@@ -78,6 +78,9 @@ async function queryBingImage() {
   console.log('请求bing图片啦')
   const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
     params: { format: 'js', n: 1 },
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+    },
   })
   if (status !== 200) {
     console.log('图片请求失败')
