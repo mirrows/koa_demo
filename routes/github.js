@@ -58,7 +58,7 @@ router.post('/addComment', async (ctx) => {
 
 
 router.get('/queryComments', async (ctx) => {
-  const { number, per_page, page } = ctx.request.query
+  const { number, per_page, page, since } = ctx.request.query
   const { authorization } = ctx.request.headers
   const { data: comments } = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}/comments`, {
     headers: {
@@ -67,7 +67,8 @@ router.get('/queryComments', async (ctx) => {
     },
     params: {
       per_page,
-      page
+      page,
+      since,
     },
   }).catch(err => {
     console.log(err)
@@ -79,7 +80,7 @@ router.get('/queryComments', async (ctx) => {
     let author = comment.user
     try {
       const { body, ...actor } = JSON.parse(result.body)
-      if(!body) {throw Error('数字会被解析的')}
+      if (!body) { throw Error('数字会被解析的') }
       author = actor
       author.avatar_url = actor.avatarUrl || `https://ui-avatars.com/api/?name=${author.login}`
       result.body = body
@@ -103,7 +104,7 @@ router.get('/queryComments', async (ctx) => {
 router.get('/listArticals', async (ctx) => {
   const { authorization } = ctx.request.headers
   const { number } = ctx.request.query
-  if(+String(number) + 1) {
+  if (+String(number) + 1) {
     // issue详情
     const data = await req.get(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/${number}`, {
       headers: {
@@ -138,7 +139,7 @@ router.get('/listArticals', async (ctx) => {
       params: {
         labels: 'blog',
         ...ctx.request.query
-    }
+      }
     }).catch(err => {
       console.log(err)
     })
@@ -207,7 +208,7 @@ router.get('/listArticals', async (ctx) => {
 //           }
 //         }
 //       }
-      
+
 //     }
 //   }
 //   `
