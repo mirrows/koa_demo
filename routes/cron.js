@@ -11,7 +11,11 @@ router.get('/bing', async ctx => {
   let todayBingUrl = url
   if (!time) {
     const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
-      params: { format: 'js', n: 1 },
+      params: {
+        format: 'js',
+        n: 1,
+        mkt: 'zh-CN',
+      },
     })
     if (status !== 200) {
       ctx.status = 500
