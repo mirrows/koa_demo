@@ -78,6 +78,13 @@ const task = cron.schedule('0 0 0 * * *', () => {
 
 task.start()
 
+router.get('/corn_bing', async ctx => {
+  await queryBingImage()
+  ctx.body = {
+    code: 0,
+  }
+})
+
 async function queryBingImage() {
   console.log('请求bing图片啦')
   const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
@@ -97,7 +104,7 @@ async function queryBingImage() {
     //   msg: '图片请求失败'
     // }
   }
-  const { addStatus, addData } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1/comments`, {
+  const { status: addStatus, data: addData } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1/comments`, {
     body: JSON.stringify(data?.images[0] || []),
   }, {
     headers: {
@@ -107,7 +114,8 @@ async function queryBingImage() {
   }).catch(err => {
     console.log(err)
   })
-  if (addStatus !== 200) {
+
+  if (addStatus >= 400) {
     console.log('图片添加失败')
     return
     // ctx.status = 500
