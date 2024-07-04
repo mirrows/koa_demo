@@ -16,12 +16,16 @@ let lastTime = 0
 
 let times = 60
 
-function countTimes() {
+function initTimes() {
   const now = Date.now()
   if (now - lastTime > 1000 * 60 * 60) {
     lastTime = now
     times = 60
   }
+}
+
+function countTimes() {
+  initTimes()
   times -= 1
 }
 
@@ -263,7 +267,8 @@ function clearCache() {
 router.post('/init_global', async (ctx) => {
   const { token, authorization } = ctx.headers;
   const { history = [] } = ctx.request.body || {};
-  clearCache()
+  clearCache();
+  initTimes();
   // if (!aiMap[token]) {
   aiMap[token] = {}
   console.log(authorization || gemini)
