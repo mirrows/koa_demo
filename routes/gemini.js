@@ -175,7 +175,12 @@ router.post('/question', async (ctx) => {
       }
     }
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
-    streamToStdoutTimeout(key, result1.stream);
+    try {
+      streamToStdoutTimeout(key, result1.stream);
+    } catch (err) {
+      console.log(err);
+      questions[key].answer.push({ text: '我的脑瓜不足以继续往下想了，你换个问题吧' })
+    }
   }
   ctx.body = {
     code: 0,
