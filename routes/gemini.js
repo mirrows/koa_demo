@@ -52,7 +52,7 @@ async function streamToStdoutTimeout(key, content) {
     }
   } catch(err) {
     console.log(err);
-    questions[key].answer.push({ text: '我的脑瓜不足以继续往下想了，你换个问题吧' })
+    questions[key].answer.push({ text: '\n...我的脑瓜不足以细想这个问题，你换一个...\n' })
   }
   
 }
@@ -180,6 +180,8 @@ router.post('/question', async (ctx) => {
         msg: '次数已用完，请等一小时后再使用'
       }
     }
+    const oldHistory = await aiMap[token].chat.getHistory()
+    console.log(oldHistory);
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
     streamToStdoutTimeout(key, result1.stream);
   }
