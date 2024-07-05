@@ -181,14 +181,13 @@ router.post('/question', async (ctx) => {
       }
     }
     const oldHistory = await aiMap[token].chat.getHistory()
+    // 去除问答失败的对话
     const protectedHistory = oldHistory.filter((e, i) => e.parts?.length && (!oldHistory[i + 1] || oldHistory[i + 1].parts?.length))
-    console.log(protectedHistory)
     if(protectedHistory.length !== oldHistory) {
       aiMap[token].chat = aiMap[token].model.startChat({
         history: protectedHistory,
       })
     }
-    console.log(JSON.stringify(protectedHistory));
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
     streamToStdoutTimeout(key, result1.stream);
   }
