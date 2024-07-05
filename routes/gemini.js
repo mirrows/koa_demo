@@ -42,13 +42,19 @@ async function streamToStdout(ctx, content) {
 }
 
 async function streamToStdoutTimeout(key, content) {
-  for await (const chunk of content) {
-    // Get first candidate's current text chunk
-    const chunkText = chunk.text();
-    console.log(chunkText)
-    // Print to console without adding line breaks
-    questions[key].answer.push({ text: chunkText })
+  try {
+    for await (const chunk of content) {
+      // Get first candidate's current text chunk
+      const chunkText = chunk.text();
+      console.log(chunkText)
+      // Print to console without adding line breaks
+      questions[key].answer.push({ text: chunkText })
+    }
+  } catch(err) {
+    console.log(err);
+    questions[key].answer.push({ text: '我的脑瓜不足以继续往下想了，你换个问题吧' })
   }
+  
 }
 
 async function displayTokenCount(model, request) {
@@ -175,12 +181,7 @@ router.post('/question', async (ctx) => {
       }
     }
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
-    try {
-      streamToStdoutTimeout(key, result1.stream);
-    } catch (err) {
-      console.log(err);
-      questions[key].answer.push({ text: '我的脑瓜不足以继续往下想了，你换个问题吧' })
-    }
+    streamToStdoutTimeout(key, result1.stream);
   }
   ctx.body = {
     code: 0,
