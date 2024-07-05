@@ -181,7 +181,7 @@ router.post('/question', async (ctx) => {
       }
     }
     const oldHistory = await aiMap[token].chat.getHistory()
-    console.log(oldHistory);
+    console.log(JSON.stringify(oldHistory.slice(-4)));
     const result1 = await aiMap[token].chat.sendMessageStream(msg);
     streamToStdoutTimeout(key, result1.stream);
   }
