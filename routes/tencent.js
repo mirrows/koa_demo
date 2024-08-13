@@ -114,6 +114,7 @@ router.post('/translation', async (ctx) => {
     SourceText, Source, Target, ProjectId: 0,
   };
   const headers = beforeReq(JSON.stringify(query));
+  console.log(666);
   const { data } = await req.post('https://tmt.ap-guangzhou.tencentcloudapi.com/', query, {
     headers,
   })
