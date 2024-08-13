@@ -15,4 +15,6 @@ module.exports = {
   dbName: process.env.DBNAME,
   mongoUri: process.env.MONGO_URI,
   gemini: process.env.GEMINI_API_KEY,
+  tencentId: process.env.TX_API_ID,
+  tencentKey: process.env.TX_API_KEY,
 }
