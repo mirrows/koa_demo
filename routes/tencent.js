@@ -11,8 +11,10 @@ function getHash(message, encoding = "hex") {
   const hash = crypto.createHash("sha256")
   return hash.update(message).digest(encoding)
 }
+// 获取当前时间戳在0时区的日期字符串
 function getDate(timestamp) {
-  const date = new Date(timestamp * 1000)
+  // 当前时间相对零时区的偏移
+  const date = new Date((timestamp + new Date().getTimezoneOffset() * 60) * 1000)
   const year = date.getFullYear()
   const month = ("0" + (date.getMonth() + 1)).slice(-2)
   const day = ("0" + date.getDate()).slice(-2)
