@@ -116,8 +116,8 @@ router.post('/translation', async (ctx) => {
   const query = {
     SourceText, Source, Target, ProjectId: 0,
   };
-  let timestamp = parseInt(String(new Date().getTime() / 1000))
-  let date = getDate(timestamp)
+  timestamp = parseInt(String(new Date().getTime() / 1000))
+  date = getDate(timestamp)
   const headers = beforeReq(JSON.stringify(query));
   // https://tmt.ap-guangzhou.tencentcloudapi.com/
   // https://tmt.eu-frankfurt.tencentcloudapi.com/
