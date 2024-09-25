@@ -14,7 +14,8 @@ function getHash(message, encoding = "hex") {
 // 获取当前时间戳在0时区的日期字符串
 function getDate(timestamp) {
   // 当前时间相对零时区的偏移
-  const date = new Date((timestamp + new Date().getTimezoneOffset() * 60) * 1000)
+  // const date = new Date((timestamp + new Date().getTimezoneOffset() * 60) * 1000)
+  const date = new Date(timestamp * 1000)
   const year = date.getFullYear()
   const month = ("0" + (date.getMonth() + 1)).slice(-2)
   const day = ("0" + date.getDate()).slice(-2)
@@ -116,7 +117,8 @@ router.post('/translation', async (ctx) => {
     SourceText, Source, Target, ProjectId: 0,
   };
   const headers = beforeReq(JSON.stringify(query));
-  const { data } = await req.post('https://tmt.ap-guangzhou.tencentcloudapi.com/', query, {
+  // https://tmt.ap-guangzhou.tencentcloudapi.com/
+  const { data } = await req.post('https://tmt.eu-frankfurt.tencentcloudapi.com/', query, {
     headers,
   })
   ctx.body = {
