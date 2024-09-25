@@ -122,6 +122,7 @@ router.post('/translation', async (ctx) => {
   ctx.body = {
     code: 0,
     data,
+    date,
   }
 })
 
