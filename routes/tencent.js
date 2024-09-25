@@ -118,13 +118,15 @@ router.post('/translation', async (ctx) => {
   };
   const headers = beforeReq(JSON.stringify(query));
   // https://tmt.ap-guangzhou.tencentcloudapi.com/
-  const { data } = await req.post('https://tmt.eu-frankfurt.tencentcloudapi.com/', query, {
+  // https://tmt.eu-frankfurt.tencentcloudapi.com/
+  const { data } = await req.post('https://tmt.ap-guangzhou.tencentcloudapi.com/', query, {
     headers,
   })
   ctx.body = {
     code: 0,
     data,
     date,
+    timestamp,
   }
 })
 
