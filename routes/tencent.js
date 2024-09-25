@@ -31,8 +31,8 @@ const service = "tmt"
 const region = "ap-guangzhou"
 const action = "TextTranslate"
 const version = "2018-03-21"
-const timestamp = parseInt(String(new Date().getTime() / 1000))
-const date = getDate(timestamp)
+let timestamp = parseInt(String(new Date().getTime() / 1000))
+let date = getDate(timestamp)
 // const payload = "{\"SourceText\":\"早上好\",\"Source\":\"zh\",\"Target\":\"en\",\"ProjectId\":0}"
 
 function beforeReq(queryString) {
@@ -116,6 +116,8 @@ router.post('/translation', async (ctx) => {
   const query = {
     SourceText, Source, Target, ProjectId: 0,
   };
+  let timestamp = parseInt(String(new Date().getTime() / 1000))
+  let date = getDate(timestamp)
   const headers = beforeReq(JSON.stringify(query));
   // https://tmt.ap-guangzhou.tencentcloudapi.com/
   // https://tmt.eu-frankfurt.tencentcloudapi.com/
