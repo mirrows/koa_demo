@@ -3,6 +3,7 @@ const app = new Koa();
 const { koaBody } = require('koa-body');
 const static = require('koa-static');
 const { loadRoutes, router } = require('./utils/routes');
+const { initRtc } = require('./utils/rtc');
 
 app.use(koaBody({jsonLimit: '50mb'}));
 
@@ -31,6 +32,8 @@ app.use(static(__dirname + '/static'));
 loadRoutes(__dirname + '/routes');
 app.use(router.routes(), router.allowedMethods())
 
-app.listen(16001, () => {
+const server = app.listen(16001, () => {
   console.log('service starts at http://localhost:16001 !!!')
 });
+
+initRtc(server)
