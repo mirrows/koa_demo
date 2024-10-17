@@ -5,10 +5,7 @@ const socketInstance = {}
 
 function initRtc(server) {
   const io = new Server(server, {
-    cors: {
-      origin: ['https://t-n.top'],
-      methods: ['GET', 'POST'],
-    },
+    cors: true,
   })
 
   io.on('connection', (socket) => {
