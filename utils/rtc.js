@@ -4,7 +4,11 @@ const rooms = new Map()
 const socketInstance = {}
 
 function initRtc(server) {
-  const io = new Server(server)
+  const io = new Server(server, {
+    cors: {
+      origin: 'https://t-n.top',
+    },
+  })
 
   io.on('connection', (socket) => {
     socket.emit('connected', socket.id)
