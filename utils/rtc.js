@@ -6,7 +6,7 @@ const socketInstance = {}
 function initRtc(server) {
   const io = new Server(server, {
     cors: {
-      origin: 'https://t-n.top',
+      withCredentials: true,
     },
   })
 
