@@ -28,23 +28,38 @@ function initRtc(server) {
     socket.on('accept_video', (info) => io.to(info.roomId).emit('accept_video', info))
 
     socket.on('offer', ({info: { socketId, roomId }, offer}) => {
-      const other = rooms.get(roomId).find(item => item.socketId !== socketId)
-      socketInstance[other.socketId].emit('receive_offer', offer)
+      const curRoomUsers = rooms.get(roomId) || []
+      const other = curRoomUsers.find(item => item.socketId !== socketId)
+      if (!other) {
+        console.log('发offer时，未找到该房间的其他用户')
+      } else {
+        socketInstance[other.socketId].emit('receive_offer', offer)
+      }
     })
 
     socket.on('answer', ({info: { socketId, roomId }, answer}) => {
-      const other = rooms.get(roomId).find(item => item.socketId !== socketId)
-      socketInstance[other.socketId].emit('receive_answer', answer)
+      const curRoomUsers = rooms.get(roomId) || []
+      const other = curRoomUsers.find(item => item.socketId !== socketId)
+      if (!other)  {
+        console.log('发answer时，未找到该房间的其他用户')
+      } else {
+        socketInstance[other.socketId].emit('receive_answer', answer)
+      }
     })
 
     socket.on('add_candidate', ({info: { socketId, roomId }, candidate}) => {
       const other = rooms.get(roomId).find(item => item.socketId !== socketId)
-      socketInstance[other.socketId].emit('add_candidate', candidate)
+      if (!other)  {
+        console.log('加candidate时，未找到该房间的其他用户')
+      } else {
+        socketInstance[other.socketId].emit('add_candidate', candidate)
+      }
     })
 
     socket.on('room_leave', (info) => {
       delete socketInstance[info.socketId]
-      const other = rooms.get(roomId).find(item => item.socketId !== socketId)
+      const curRoomUsers = rooms.get(roomId) || []
+      const other = curRoomUsers.find(item => item.socketId !== socketId)
       if (other) {
         rooms.set(info.roomId, [other])
         socketInstance[other.socketId].emit('room_leave', info)
