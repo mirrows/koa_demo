@@ -32,7 +32,7 @@ function initRtc(server) {
       const curRoomUsers = rooms.get(roomId) || []
       const other = curRoomUsers.find(item => item.socketId !== socketId)
       if (!other) {
-        console.log('发offer时，未找到该房间的其他用户')
+        console.log(`发offer时，未找到${roomId}房间的其他用户`)
       } else {
         socketInstance[other.socketId].emit('receive_offer', offer)
       }
@@ -42,7 +42,7 @@ function initRtc(server) {
       const curRoomUsers = rooms.get(roomId) || []
       const other = curRoomUsers.find(item => item.socketId !== socketId)
       if (!other)  {
-        console.log('发answer时，未找到该房间的其他用户')
+        console.log(`发answer时，未找到${roomId}房间的其他用户`)
       } else {
         socketInstance[other.socketId].emit('receive_answer', answer)
       }
@@ -53,7 +53,7 @@ function initRtc(server) {
       console.log(curRoomUsers)
       const other = curRoomUsers.find(item => item.socketId !== socketId)
       if (!other)  {
-        console.log('加candidate时，未找到该房间的其他用户')
+        console.log(`加candidate时，未找到${roomId}房间的其他用户`)
       } else {
         socketInstance[other.socketId].emit('add_candidate', candidate)
       }
