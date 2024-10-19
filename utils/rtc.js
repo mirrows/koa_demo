@@ -52,6 +52,18 @@ function initRtc(server) {
         rooms.delete(info.roomId)
       }
     })
+
+    // 监听 disconnect 事件
+    socket.on('disconnect', (reason) => {
+      console.log('User disconnected', reason);
+      // 这里可以执行清理工作，比如移除用户相关的状态信息
+    });
+
+    // 监听 disconnect 事件
+    socket.on('close', (reason) => {
+      console.log('connection closed', reason);
+      // 这里可以执行清理工作，比如移除用户相关的状态信息
+    });
   })
 }
 
