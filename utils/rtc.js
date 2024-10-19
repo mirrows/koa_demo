@@ -21,6 +21,7 @@ function initRtc(server) {
         // 客户端socketId绑定服务端socket
         socketInstance[socketId] = socket
       }
+      console.log('当前房间有用户', rooms.get(roomId))
     })
 
     socket.on('request_video', (info) => io.to(info.roomId).emit('receive_video', info))
@@ -48,7 +49,9 @@ function initRtc(server) {
     })
 
     socket.on('add_candidate', ({info: { socketId, roomId }, candidate}) => {
-      const other = rooms.get(roomId).find(item => item.socketId !== socketId)
+      const curRoomUsers = rooms.get(roomId) || []
+      console.log(curRoomUsers)
+      const other = curRoomUsers.find(item => item.socketId !== socketId)
       if (!other)  {
         console.log('加candidate时，未找到该房间的其他用户')
       } else {
