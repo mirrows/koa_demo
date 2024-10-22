@@ -13,6 +13,7 @@ function initRtc(server) {
     socket.on('create_or_join_room', (info) => {
       const { roomId, socketId } = info
       const curRoomUsers = rooms.get(roomId) || []
+      console.log(curRoomUsers)
       if(curRoomUsers.length >= 2) {
         socket.emit('room_full', roomId)
       } else {
@@ -70,6 +71,7 @@ function initRtc(server) {
     })
 
     socket.on('room_leave', (info) => {
+      socketInstance[info.socketId].leave(info.roomId);
       delete socketInstance[info.socketId]
       const curRoomUsers = rooms.get(info.roomId) || []
       const other = curRoomUsers.find(item => item.socketId !== info.socketId)
