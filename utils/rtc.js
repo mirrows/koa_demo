@@ -17,6 +17,11 @@ function initRtc(server) {
         socket.emit('room_full', roomId)
       } else {
         socket.join(roomId)
+        if (curRoomUsers.length) {
+          io.to(roomId).emit('room_joined', { user: info, another: curRoomUsers[0] })
+        } else {
+          io.to(roomId).emit('room_created', info)
+        }
         io.to(roomId).emit(curRoomUsers.length ? 'room_joined' : 'room_created', info)
         rooms.set(roomId, [...curRoomUsers, info])
         // 客户端socketId绑定服务端socket
