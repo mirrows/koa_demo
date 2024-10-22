@@ -38,17 +38,16 @@ function initRtc(server) {
       }
     })
 
-    socket.on('answer', ({info: { socketId, roomId }, answer}) => {
-      const curRoomUsers = rooms.get(roomId) || []
-      const other = curRoomUsers.find(item => item.socketId !== socketId)
+    socket.on('answer', ({info, answer}) => {
+      const curRoomUsers = rooms.get(info.roomId) || []
+      const other = curRoomUsers.find(item => item.socketId !== info.socketId)
       console.log('收到来自以下用户的answer');
-      console.log(other);
+      console.log(info);
       console.log('即将给以下用户发送receive_answer');
       console.log(other);
       if (!other)  {
-        console.log(`发answer时，未找到${roomId}房间的其他用户`)
+        console.log(`发answer时，未找到${info.roomId}房间的其他用户`)
       } else {
-        console.log(socketInstance[other.socketId])
         socketInstance[other.socketId].emit('receive_answer', answer)
       }
     })
