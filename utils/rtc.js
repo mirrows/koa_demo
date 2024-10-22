@@ -7,6 +7,7 @@ function initRtc(server) {
   const io = new Server(server)
 
   io.on('connection', (socket) => {
+    console.log(6666, socket.id);
     socket.emit('connected', socket.id)
 
     socket.on('create_or_join_room', (info) => {
