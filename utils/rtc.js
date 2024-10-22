@@ -22,7 +22,7 @@ function initRtc(server) {
         } else {
           io.to(roomId).emit('room_created', info)
         }
-        io.to(roomId).emit(curRoomUsers.length ? 'room_joined' : 'room_created', info)
+        // io.to(roomId).emit(curRoomUsers.length ? 'room_joined' : 'room_created', info)
         rooms.set(roomId, [...curRoomUsers, info])
         // 客户端socketId绑定服务端socket
         socketInstance[socketId] = socket
