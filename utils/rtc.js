@@ -77,6 +77,7 @@ function initRtc(server) {
       }
       const curRoomUsers = rooms.get(info.roomId) || []
       const other = curRoomUsers.find(item => item.socketId !== info.socketId)
+      console.log('room leave', curRoomUsers, info)
       if (other) {
         rooms.set(info.roomId, [other])
         socketInstance[other.socketId].emit('room_leave', info)
