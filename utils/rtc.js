@@ -13,6 +13,7 @@ function initRtc(server) {
     socket.on('create_or_join_room', ({ info, roomId }) => {
       const { socketId } = info
       const curRoomUsers = rooms.get(roomId || info.roomId) || []
+      console.log(roomId, curRoomUsers.length)
       if (roomId && curRoomUsers.length === 0) {
         socket.emit('room_joined', { user: info, another: info, result: 404 })
         return
