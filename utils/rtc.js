@@ -10,9 +10,12 @@ function initRtc(server) {
     console.log(6666, socket.id);
     socket.emit('connected', socket.id)
 
-    socket.on('create_or_join_room', (info) => {
-      const { roomId, socketId } = info
-      const curRoomUsers = rooms.get(roomId) || []
+    socket.on('create_or_join_room', ({ info, roomId }) => {
+      const { socketId } = info
+      const curRoomUsers = rooms.get(roomId || info.roomId) || []
+      if (roomId && curRoomUsers.length === 0) {
+        socket.emit('room_joined', { user: info, another: info, result: 404 })
+      }
       console.log(curRoomUsers)
       if(curRoomUsers.length >= 2) {
         socket.emit('room_full', roomId)
