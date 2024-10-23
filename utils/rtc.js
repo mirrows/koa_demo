@@ -30,7 +30,11 @@ function initRtc(server) {
       } else {
         socket.join(roomId)
         if (curRoomUsers.length) {
-          io.to(roomId).emit('room_joined', { user: info, another: curRoomUsers[0], ...(targetRoomId ? {result: 200} : {}) })
+          io.to(roomId).emit('room_joined', {
+            user: info,
+            another: curRoomUsers[0],
+            ...(targetRoomId ? {result: 200} : {})
+          })
         } else {
           io.to(roomId).emit('room_created', info)
         }
