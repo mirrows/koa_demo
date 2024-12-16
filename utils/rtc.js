@@ -7,7 +7,6 @@ function initRtc(server) {
   const io = new Server(server)
 
   io.on('connection', (socket) => {
-    console.log(6666, socket.id);
     socket.emit('connected', socket.id)
 
     socket.on('create_or_join_room', ({ info, roomId: targetRoomId }) => {
@@ -45,44 +44,30 @@ function initRtc(server) {
       }
       console.log('当前房间有用户', rooms.get(roomId))
     })
+    socket.on('join', ({ info }) => {
+      const { socketId } = info
+      const curRoomUsers = rooms.get("common_room") || []
+      socket.emit('join', {
+        user: info,
+        another: curRoomUsers.filter(user => user.socketId !== socketId),
+      })
+    })
+    
 
     socket.on('request_video', (info) => io.to(info.roomId).emit('receive_video', info))
     socket.on('receive_video', (info) => io.to(info.roomId).emit('receive_video', info))
     socket.on('accept_video', (info) => io.to(info.roomId).emit('accept_video', info))
 
-    socket.on('offer', ({info: { socketId, roomId }, offer}) => {
-      const curRoomUsers = rooms.get(roomId) || []
-      const other = curRoomUsers.find(item => item.socketId !== socketId)
-      if (!other) {
-        console.log(`发offer时，未找到${roomId}房间的其他用户`)
-      } else {
-        socketInstance[other.socketId].emit('receive_offer', offer)
-      }
+    socket.on('offer', ({info, offer, to: other}) => {
+      socketInstance[other.socketId].emit('receive_offer', {info, offer, to: other})
     })
 
-    socket.on('answer', ({info, answer}) => {
-      const curRoomUsers = rooms.get(info.roomId) || []
-      const other = curRoomUsers.find(item => item.socketId !== info.socketId)
-      console.log('收到来自以下用户的answer');
-      console.log(info);
-      console.log('即将给以下用户发送receive_answer');
-      console.log(other);
-      if (!other)  {
-        console.log(`发answer时，未找到${info.roomId}房间的其他用户`)
-      } else {
-        socketInstance[other.socketId].emit('receive_answer', answer)
-      }
+    socket.on('answer', ({info, answer, to: other}) => {
+      socketInstance[other.socketId].emit('receive_answer', {info, answer, to: other})
     })
 
-    socket.on('add_candidate', ({info: { socketId, roomId }, candidate}) => {
-      const curRoomUsers = rooms.get(roomId) || []
-      console.log(curRoomUsers)
-      const other = curRoomUsers.find(item => item.socketId !== socketId)
-      if (!other)  {
-        console.log(`加candidate时，未找到${roomId}房间的其他用户???`)
-      } else {
-        socketInstance[other.socketId].emit('add_candidate', candidate)
-      }
+    socket.on('add_candidate', ({info, candidate, to: ohter}) => {
+      socketInstance[other.socketId].emit('add_candidate', {info, candidate, to: ohter})
     })
 
     socket.on('room_leave', (info) => {
@@ -92,11 +77,33 @@ function initRtc(server) {
       }
       const curRoomUsers = rooms.get(info.roomId) || []
       if (!curRoomUsers.some(item => item.socketId === info.socketId)) return
-      const other = curRoomUsers.find(item => item.socketId !== info.socketId)
+      const other = curRoomUsers.filter(item => item.socketId !== info.socketId)
       console.log('room leave', curRoomUsers, info)
-      if (other) {
-        rooms.set(info.roomId, [other])
-        socketInstance[other.socketId].emit('room_leave', info)
+      if (other && other.length) {
+        rooms.set(info.roomId, [...other])
+        other.forEach(user => {
+          socketInstance[user.socketId].emit('room_leave', info)
+        })
+        // socketInstance[other.socketId].emit('room_leave', info)
+      } else {
+        rooms.delete(info.roomId)
+      }
+    })
+    socket.on('leave', (info) => {
+      if (socketInstance[info.socketId]) {
+        socketInstance[info.socketId].leave(info.roomId);
+        delete socketInstance[info.socketId]
+      }
+      const curRoomUsers = rooms.get('common_room') || []
+      if (!curRoomUsers.some(item => item.socketId === info.socketId)) return
+      const other = curRoomUsers.filter(item => item.socketId !== info.socketId)
+      console.log('room leave', curRoomUsers, info)
+      if (other && other.length) {
+        rooms.set(info.roomId, [...other])
+        other.forEach(user => {
+          socketInstance[user.socketId].emit('leave', info)
+        })
+        // socketInstance[other.socketId].emit('room_leave', info)
       } else {
         rooms.delete(info.roomId)
       }
