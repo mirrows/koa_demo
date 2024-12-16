@@ -66,8 +66,8 @@ function initRtc(server) {
       socketInstance[other.socketId].emit('receive_answer', {info, answer, to: other})
     })
 
-    socket.on('add_candidate', ({info, candidate, to: ohter}) => {
-      socketInstance[other.socketId].emit('add_candidate', {info, candidate, to: ohter})
+    socket.on('add_candidate', ({info, candidate, to: other}) => {
+      socketInstance[other.socketId].emit('add_candidate', {info, candidate, to: other})
     })
 
     socket.on('room_leave', (info) => {
