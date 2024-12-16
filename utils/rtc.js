@@ -67,6 +67,7 @@ function initRtc(server) {
     })
 
     socket.on('add_candidate', ({info, candidate, to: other}) => {
+      if (!other) return;
       socketInstance[other.socketId].emit('add_candidate', {info, candidate, to: other})
     })
 
