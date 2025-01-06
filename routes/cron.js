@@ -70,6 +70,7 @@ router.get('/bing', async ctx => {
   }
 })
 
+// const task = cron.schedule('20 * * * * *', () => {
 const task = cron.schedule('0 0 0 * * *', () => {
   queryBingImage()
 }, {
@@ -86,7 +87,7 @@ router.get('/corn_bing', async ctx => {
 })
 
 async function queryBingImage() {
-  console.log('请求bing图片啦')
+  console.log('请求bing图片啦', new Date().toString())
   const { status, data } = await req.get('https://bing.com/HPImageArchive.aspx', {
     params: {
       format: 'js', n: 1, mkt: 'zh-CN',
@@ -112,7 +113,7 @@ async function queryBingImage() {
       Authorization: githubToken,
     },
   }).catch(err => {
-    console.log(err)
+    console.log(err.name)
   })
 
   if (addStatus >= 400) {

@@ -5,7 +5,7 @@ const socketInstance = {}
 const GLOBAL_ROOM = 'common_room'
 
 function initRtc(server) {
-  const io = new Server(server)
+  const io = new Server(server);
 
   io.on('connection', (socket) => {
     console.log('socket connection started');
