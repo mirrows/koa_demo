@@ -1,6 +1,6 @@
 const { req } = require('../utils/req');
 const { gUser, githubToken } = require("../utils/config");
-const { Format } = require('../utils/common');
+const { Format, wait } = require('../utils/common');
 const { imgUrlToBase64 } = require('../utils/imgTool');
 const cron = require('node-cron')
 
@@ -99,6 +99,7 @@ async function getBingMsg() {
     })
   } catch (err) {
     console.log('请求图片失败', err.code);
+    await wait(1000);
     res = await getBingMsg();
   }
   return res;
