@@ -102,6 +102,8 @@ async function getBingMsg() {
     await wait(1000);
     res = await getBingMsg();
   }
+  console.log(res.data);
+
   return res;
 }
 
@@ -118,7 +120,7 @@ async function queryBingImage() {
     // }
   }
   const { status: addStatus, data: addData } = await req.post(`https://api.github.com/repos/${gUser}/${gUser}.github.io/issues/1/comments`, {
-    body: JSON.stringify(data?.images[0] || []),
+    body: JSON.stringify(data?.images?.[0] || []),
   }, {
     headers: {
       Accept: "application/vnd.github+json",
