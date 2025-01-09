@@ -41,13 +41,14 @@ function initRtc(server) {
       console.log('当前房间有用户', rooms.get(roomId))
     })
     socket.on('join', ({ info }) => {
-      const { socketId } = info
-      socket.join(GLOBAL_ROOM)
-      const curRoomUsers = rooms.get(GLOBAL_ROOM) || []
+      const { socketId, roomId: id } = info
+      const roomId = id || GLOBAL_ROOM;
+      socket.join(roomId)
+      const curRoomUsers = rooms.get(roomId) || []
       const users = curRoomUsers.filter(user => socketInstance[user.socketId]).concat(info);
-      rooms.set(GLOBAL_ROOM, users)
+      rooms.set(roomId, users)
       socketInstance[socketId] = socket
-      io.to(GLOBAL_ROOM).emit('join', {
+      io.to(roomId).emit('join', {
         user: info,
         another: users,
       })
@@ -91,11 +92,13 @@ function initRtc(server) {
       }
     })
     socket.on('leave', (info) => {
+      const { roomId: id } = info
       if (socketInstance[info.socketId]) {
         socketInstance[info.socketId].leave(info.roomId);
         delete socketInstance[info.socketId]
       }
-      const curRoomUsers = rooms.get(GLOBAL_ROOM) || []
+      const roomId = id || GLOBAL_ROOM;
+      const curRoomUsers = rooms.get(roomId) || []
       if (!curRoomUsers.some(item => item.socketId === info.socketId)) return
       const other = curRoomUsers.filter(item => item.socketId !== info.socketId)
       console.log('room leave', curRoomUsers, info)
