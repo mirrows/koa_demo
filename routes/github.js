@@ -141,7 +141,7 @@ router.get('/listArticals', async (ctx) => {
         ...ctx.request.query
       }
     }).catch(err => {
-      console.log(err)
+      console.log(err.code)
     })
     const query = `query{
       repository(owner: "${gUser}", name: "${gUser}.github.io"){

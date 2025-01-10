@@ -43,6 +43,7 @@ function initRtc(server) {
     socket.on('join', ({ info }) => {
       const { socketId, roomId: id } = info
       const roomId = id || GLOBAL_ROOM;
+      console.log(info, roomId);
       socket.join(roomId)
       const curRoomUsers = rooms.get(roomId) || []
       const users = curRoomUsers.filter(user => socketInstance[user.socketId]).concat(info);
