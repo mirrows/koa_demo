@@ -86,7 +86,7 @@ router.get('/corn_bing', async ctx => {
   }
 })
 
-async function getBingMsg() {
+async function getBingMsg(n = 1) {
   let res = {};
   try {
     res = await req.get('https://bing.com/HPImageArchive.aspx', {
@@ -99,8 +99,10 @@ async function getBingMsg() {
     })
   } catch (err) {
     console.log('请求图片失败', err.code);
-    await wait(1000);
-    res = await getBingMsg();
+    if (n < 3) {
+      await wait(1000);
+      res = await getBingMsg(n+1);
+    }
   }
   console.log(res.data);
 
