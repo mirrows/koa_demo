@@ -29,8 +29,8 @@ app.use(async (ctx, next) => {
     ctx.set({
       'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
       'Content-Type': mime.lookup(fullPath) || 'application/octet-stream',
-      'Content-Length': size.toString(),
       'Transfer-Encoding': 'chunked',
+      'Content-Length': size.toString(),
     });
     ctx.body = fs.createReadStream(fullPath);
     return;
