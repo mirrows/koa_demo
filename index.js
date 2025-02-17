@@ -19,6 +19,8 @@ app.use(async (ctx, next) => {
     console.log(filePath, 'will be downloaded');
     const fileName = path.basename(filePath);
     const fullPath = path.join(__dirname + '/static', filePath.substring(1));
+    const size = fs.statSync(fullPath).size;
+    console.log(fullPath, size);
     if (!fs.existsSync(fullPath)) {
       ctx.status = 404;
       ctx.body = { code: 404, msg: 'file not found' };
@@ -27,7 +29,7 @@ app.use(async (ctx, next) => {
     ctx.set({
       'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
       'Content-Type': mime.lookup(fullPath) || 'application/octet-stream',
-      'Content-Length': fs.statSync(fullPath).size,
+      'Content-Length': size.toString(),
       'Transfer-Encoding': 'chunked',
     });
     ctx.body = fs.createReadStream(fullPath);
