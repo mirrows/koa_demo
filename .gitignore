@@ -8,7 +8,7 @@ xv.js
 
 # testing
 /coverage
-
+/static/download
 # next.js
 /.next/
 /out/
