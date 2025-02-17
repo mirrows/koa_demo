@@ -4,9 +4,6 @@ const { koaBody } = require('koa-body');
 const static = require('koa-static');
 const { loadRoutes, router } = require('./utils/routes');
 const { initRtc } = require('./utils/rtc');
-const path = require('path');
-const fs = require('fs');
-const mime = require('mime-types');
 
 app.use(koaBody({jsonLimit: '50mb'}));
 
@@ -14,27 +11,6 @@ app.use(async (ctx, next) => {
   ctx.set('Access-Control-Allow-Origin', '*');
   ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild, timestamp, token');
   ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-  const filePath = decodeURIComponent(ctx.request.path);
-  if (filePath.startsWith('/download/')) { 
-    console.log(filePath, 'will be downloaded');
-    const fileName = path.basename(filePath);
-    const fullPath = path.join(__dirname + '/static', filePath.substring(1));
-    const size = fs.statSync(fullPath).size;
-    console.log(fullPath, size);
-    if (!fs.existsSync(fullPath)) {
-      ctx.status = 404;
-      ctx.body = { code: 404, msg: 'file not found' };
-      return;
-    }
-    ctx.set({
-      'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
-      'Content-Type': mime.lookup(fullPath) || 'application/octet-stream',
-      'Transfer-Encoding': 'chunked',
-      'Content-Length': size.toString(),
-    });
-    ctx.body = fs.createReadStream(fullPath);
-    return;
-  }
   if (ctx.method == 'OPTIONS') {
     ctx.body = 200;
   } else {
