@@ -6,6 +6,8 @@ const cron = require('node-cron')
 
 const router = require('koa-router')(); //引入并实例化
 
+let task = null
+
 router.get('/bing', async ctx => {
   const { time, url, name = 'bing.jpg' } = ctx.request.query
   let todayBingUrl = url
@@ -70,14 +72,18 @@ router.get('/bing', async ctx => {
   }
 })
 
-// const task = cron.schedule('20 * * * * *', () => {
-const task = cron.schedule('0 0 0 * * *', () => {
-  queryBingImage()
-}, {
-  timezone: 'Asia/Shanghai'
-})
+function updateSchedule(newPattern) {
+    // 关键：先彻底销毁旧的
+    task.destroy();  // 注意不是 stop()
+    // 再创建新的
+    task = cron.schedule(newPattern, () => {
+      queryBingImage()
+    }, {
+      timezone: 'Asia/Shanghai'
+    });
+}
 
-task.start()
+updateSchedule('0 0 0 * * *') // 每天凌晨执行
 
 router.get('/corn_bing', async ctx => {
   await queryBingImage()
