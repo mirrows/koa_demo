@@ -74,7 +74,7 @@ router.get('/bing', async ctx => {
 
 function updateSchedule(newPattern) {
     // 关键：先彻底销毁旧的
-    task.destroy();  // 注意不是 stop()
+    task?.destroy();  // 注意不是 stop()
     // 再创建新的
     task = cron.schedule(newPattern, () => {
       queryBingImage()
